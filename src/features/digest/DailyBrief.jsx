@@ -54,7 +54,7 @@ export default function DailyBrief() {
 
     return (
         <div className="fade-in">
-            <h2 className="ui-mono" style={{ marginTop: 0 }}>Daily Brief — {todayUTC()}</h2>
+            <h2 className="ui-mono" style={{ marginTop: 0 }}>Daily brief — {todayUTC()}</h2>
 
             <div className="panel" style={{ padding: 12, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
                 <div className="kicker">Controls</div>

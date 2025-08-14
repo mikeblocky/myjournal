@@ -31,12 +31,18 @@
 
 .menu-btn{ display:none; }
 
+/* ---------- Mobile behavior ---------- */
 @media (max-width: 900px){
+  /* Only username, theme toggle, hamburger on the bar */
   .nav-inline{ display:none; }
   .actions .search{ display:none; }
+  .actions .write-btn{ display:none; } /* hide topbar Write */
+  .actions .login-btn{ display:none; } /* hide topbar Login */
+  .account .logout-btn{ display:none; } /* hide topbar Logout */
   .menu-btn{ display:inline-flex; align-items:center; justify-content:center; }
 }
 
+/* ---------- Menu sheet ---------- */
 .menu-sheet{
   position: fixed; top: var(--topbar-h); left: 0; right: 0;
   background: var(--bg); border-bottom: 1px solid var(--border);
@@ -53,3 +59,16 @@
 }
 
 .menu-nav{ display:grid; grid-auto-rows: minmax(36px, auto); gap:6px; }
+
+/* ---------- Floating Write (mobile only) ---------- */
+.fab{
+  position: fixed;
+  right: 16px; bottom: 20px;
+  z-index: 60;
+  padding: 10px 14px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
+@media (min-width: 901px){
+  .fab{ display:none; }
+}
