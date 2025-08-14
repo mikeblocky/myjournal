@@ -1,0 +1,11 @@
+.brand{ display:flex; align-items:center; gap: var(--space-3); margin-bottom: var(--space-6); }
+.logo{ width:28px; height:28px; display:grid; place-items:center; border:1px solid var(--border); border-radius: 6px; }
+.title{ font-weight: 700; }
+
+.nav{ display:grid; gap: 4px; }
+.nav a{ color: var(--text); }
+.nav a[aria-current="page"]{ background: color-mix(in oklab, var(--panel) 80%, var(--accent) 20%); }
+
+.grow{ flex:1 }
+.actions{ display:grid; gap: var(--space-3); margin-top: var(--space-6); }
+.sidebar{ display:flex; flex-direction:column; }

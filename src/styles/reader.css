@@ -1,0 +1,122 @@
+/* Reader shell */
+.reader-wrap { position: relative; }
+.reading-progress{
+  position: sticky; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: .85;
+  z-index: 60;
+}
+
+.reader{
+  max-width: 74ch;
+  margin: 0 auto;
+  padding: 4px;
+}
+.reader header.reader-head{
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+}
+
+.reader-title{
+  margin: 0 0 6px 0;
+  font-family: var(--font-ui);
+  letter-spacing: .2px;
+}
+.reader-meta{
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: 12px; color: var(--muted);
+}
+.chip{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--panel);
+}
+
+/* Typography */
+.reader-content{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2);
+  box-shadow: var(--shadow-1);
+  padding: 20px;
+}
+
+.reader-content :where(p, li){ text-wrap: pretty; }
+.reader-content > p:first-of-type{
+  font-size: 1.15rem;
+  line-height: 1.75;
+}
+
+/* Headings */
+.reader-content h1,.reader-content h2,.reader-content h3{
+  font-family: var(--font-ui);
+  letter-spacing: .2px;
+  margin: 1.4em 0 .6em;
+}
+.reader-content h1{ font-size: 1.8rem; }
+.reader-content h2{ font-size: 1.4rem; }
+.reader-content h3{ font-size: 1.2rem; }
+
+/* Links */
+.reader-content a{
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Quotes */
+.reader-content blockquote{
+  margin: 1.2em 0; padding: .9em 1em;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in oklab, var(--panel) 92%, var(--accent) 8%);
+  border-radius: var(--radius-1);
+}
+
+/* Images & captions */
+.reader-content figure{ margin: 1.2em auto; text-align: center; }
+.reader-content img{
+  max-width: 100%; height: auto;
+  border-radius: 10px; box-shadow: var(--shadow-1);
+}
+.reader-content figcaption{
+  margin-top: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px; color: var(--muted);
+}
+
+/* Code & pre */
+.reader-content pre{
+  overflow-x: auto; padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px; background: color-mix(in oklab, var(--panel) 90%, var(--accent) 10%);
+}
+.reader-content code{
+  font-family: var(--font-ui);
+  font-size: .95em;
+}
+
+/* Tables */
+.reader-content table{
+  width: 100%; border-collapse: collapse; margin: 1em 0;
+}
+.reader-content th, .reader-content td{
+  border-bottom: 1px solid var(--border); padding: 10px;
+}
+.reader-content th{ text-align: left; font-family: var(--font-ui); }
+
+/* HR */
+.reader-content hr{
+  height: 1px; border: 0; background: var(--border);
+  margin: 2em 0;
+}
+
+/* widen the reading column a touch on very large displays */
+@media (min-width: 1200px){ .reader{ max-width: 80ch; } }
+@media (min-width: 1600px){ .reader{ max-width: 86ch; } }

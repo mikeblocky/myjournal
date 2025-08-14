@@ -1,0 +1,150 @@
+/* Geist Mono (UI/titles/buttons) */
+@font-face{
+  font-family:"Geist Mono";
+  src:url("/fonts/geist-mono/GeistMono-VariableFont_wght.woff2") format("woff2-variations");
+  font-weight:100 900;
+  font-style:normal;
+  font-display:swap;
+}
+
+/* color palettes */
+:root {
+  --font-ui: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-content: "Source Serif 4", Georgia, serif;
+
+  /* light (warm beige) */
+  --bg: #f6f2ea;
+  --panel: #fffaf3;
+  --text: #2c2a28;
+  --muted: #6e655d;
+  --border: #e6ded2;
+  --accent: #7b5f4c;         /* warm brown for links/buttons */
+  --accent-contrast: #fff7ee;
+  --selection: #e9dccb;
+}
+
+/* dark */
+html[data-theme="dark"]{
+  --bg: #141210;
+  --panel: #1c1917;
+  --text: #efe8de;
+  --muted: #b9b0a6;
+  --border: #2a2623;
+  --accent: #d5b995;
+  --accent-contrast: #141210;
+  --selection: #2a241f;
+}
+
+/* base */
+*{box-sizing:border-box}
+::selection{background: var(--selection)}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: var(--font-content);
+  line-height:1.55;
+  text-rendering:optimizeLegibility;
+}
+
+/* headings & UI elements use mono */
+h1,h2,h3,h4,h5,h6,.ui-mono,.btn,.nav, label, input, textarea{
+  font-family: var(--font-ui);
+  letter-spacing: .1px;
+}
+
+/* links */
+a{ color: var(--accent); text-decoration: none; }
+a:hover{ text-decoration: underline; }
+
+/* buttons */
+.btn{
+  appearance:none; border:1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--radius-1);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-med), border-color var(--dur-med);
+}
+.btn.primary{
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+.btn:hover{ transform: translateY(-1px) scale(1.01); }
+.btn:active{ transform: translateY(0) scale(.99); }
+
+/* layout */
+.app{
+  display:grid;
+  grid-template-columns: 280px 320px 1fr;
+  gap: var(--space-6);
+  min-height:100%;
+  padding: var(--space-6);
+}
+
+/* cards/panels */
+.panel{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2);
+  box-shadow: var(--shadow-1);
+}
+
+/* sidebar */
+.sidebar{
+  padding: var(--space-6);
+  position: sticky; top: var(--space-6);
+  height: calc(100dvh - var(--space-12));
+}
+.nav a{
+  display:block; padding: 10px 12px; border-radius: 10px;
+}
+.nav a:hover{ background: color-mix(in oklab, var(--panel) 85%, var(--accent) 15%); }
+
+/* middle column = "activity" */
+.activity{ padding: var(--space-6); }
+
+/* main content area */
+.main{ padding: var(--space-6); }
+
+/* subtle entrances */
+.fade-in{ animation: fade-slide var(--dur-slow) var(--ease-out) both; }
+@keyframes fade-slide{
+  from{ opacity:0; transform: translateY(6px) }
+  to{ opacity:1; transform: translateY(0) }
+}
+
+/* responsive */
+@media (max-width: 1100px){
+  .app{ grid-template-columns: 240px 1fr; }
+  .activity{ display:none; }
+}
+@media (max-width: 720px){
+  .app{ grid-template-columns: 1fr; padding: var(--space-4); }
+  .sidebar{
+    position: fixed; inset: 0 auto 0 0; width: 84%;
+    transform: translateX(-100%);
+    transition: transform var(--dur-med) var(--ease-out);
+    z-index: 30;
+  }
+  .sidebar.open{ transform: translateX(0); }
+  .backdrop{
+    position: fixed; inset:0; background: rgba(0,0,0,.32);
+    backdrop-filter: blur(2px);
+    z-index: 20;
+  }
+  .header{
+    position: sticky; top:0; z-index: 25;
+    display:flex; align-items:center; gap: var(--space-3);
+    padding: var(--space-4); background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+:root{ --page-max: 1160px; }
+@media (min-width: 1440px){ :root{ --page-max: 1360px; } }
+@media (min-width: 1760px){ :root{ --page-max: 1500px; } }
+

@@ -1,0 +1,18 @@
+:root {
+  /* spacing */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+
+  /* radii & shadow */
+  --radius-1: 8px; --radius-2: 12px; --radius-round: 999px;
+  --shadow-1: 0 6px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+
+  /* motion */
+  --dur-fast: 120ms; --dur-med: 220ms; --dur-slow: 360ms;
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+}
+
+/* prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur-med: 0ms; --dur-slow: 0ms; --ease-out: linear; }
+}
