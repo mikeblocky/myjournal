@@ -1,17 +1,16 @@
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
+// frontend/src/lib/http.js
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
-export async function http(path, { method = "GET", headers = {}, body, token } = {}) {
-  const res = await fetch(`${BASE}${path}`, {
+export async function http(path, { method="GET", token, body } = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: {
-      "Content-Type": body ? "application/json" : undefined,
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
     },
+    credentials: "omit", // important for CORS "*"
     body: body ? JSON.stringify(body) : undefined,
   });
-  const isJson = res.headers.get("content-type")?.includes("application/json");
-  const data = isJson ? await res.json() : null;
-  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
-  return data;
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
 }
