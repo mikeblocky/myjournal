@@ -64,3 +64,89 @@
 /* interactive bits */
 .j-link{ color: var(--text); text-decoration:none; }
 .j-link:hover .j-hed, .j-link:hover .j-title{ text-decoration: underline; }
+
+/* Outline mode styles */
+.outline-mode {
+  font-family: var(--font-mono);
+  line-height: 1.6;
+}
+
+.outline-bullet {
+  color: var(--accent);
+  font-weight: 500;
+  margin-right: 0.5em;
+}
+
+.outline-item {
+  margin-bottom: 0.75em;
+  padding-left: 1.2em;
+  position: relative;
+}
+
+.outline-item:last-child {
+  margin-bottom: 0;
+}
+
+.outline-indicator {
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Mode toggle buttons */
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-toggle .btn {
+  font-size: 0.9em;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+}
+
+.mode-toggle .btn.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* AI Outline button */
+.ai-outline-btn {
+  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--text) 20%));
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.ai-outline-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ai-outline-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Outline mode tips */
+.outline-tips {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 90%, var(--text) 10%));
+  color: white;
+  border-radius: var(--radius-1);
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Keyboard shortcuts */
+kbd {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  margin: 0 2px;
+}
