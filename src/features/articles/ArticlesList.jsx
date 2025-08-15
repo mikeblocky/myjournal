@@ -95,7 +95,7 @@ export default function ArticlesList(){
   }, [items, source, diverse]);
 
   return (
-    <div className="fade-in page container">
+    <div className="fade-in page">
       {/* responsive toolbar */}
       <div className="j-toolbar toolbar-responsive">
         <div className="toolbar-left">
@@ -189,7 +189,7 @@ export default function ArticlesList(){
           <p className="prose">No articles found.</p>
         </div>
       ) : (
-        <section className="content-grid-responsive">
+        <section className="a-grid">
           {/* Hero card (first item) */}
           {filtered[0] && <ArticleCard a={filtered[0]} hero />}
           {/* Rest */}
@@ -211,29 +211,35 @@ function ArticleCard({ a, hero=false }){
   const host = hostFromUrl(a.url);
   const img = a.imageUrl || "";
   const reading = a.readingMins ? `~${a.readingMins} min` : "";
-  const className = hero ? "a-card a-hero card card-responsive card-shadow-responsive" : "a-card card card-responsive card-shadow-responsive";
+  const className = hero ? "a-card a-hero card" : "a-card card";
   return (
     <article className={className}>
       <div className="a-imgwrap">
         {img ? (
-          <img className="a-img img-responsive-hero" src={img} alt="" loading="lazy" />
-        ) : (
-          <div className="a-img a-placeholder">
-            <span className="ui-mono">{initials(host || "news")}</span>
-          </div>
-        )}
+          <img 
+            className="a-img" 
+            src={img} 
+            alt="" 
+            loading="lazy"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextElementSibling.style.display = 'block';
+            }}
+          />
+        ) : null}
+        <div className="a-img a-placeholder" style={{ display: img ? 'none' : 'block' }}>
+          <span className="ui-mono">{initials(host || "news")}</span>
+        </div>
         {host && <div className="a-badge ui-mono">{host}</div>}
       </div>
 
       <div className="a-body">
-        <Link to={`/articles/${a.id}`} className="a-title ui-mono text-responsive-lg">{a.title || "(untitled)"}</Link>
-        {a.excerpt && <p className="prose a-excerpt text-responsive-base">{a.excerpt}</p>}
-        <div className="a-meta flex-responsive-sm">
+        <Link to={`/articles/${a.id}`} className="a-title ui-mono">{a.title || "(untitled)"}</Link>
+        {a.excerpt && <p className="prose a-excerpt">{a.excerpt}</p>}
+        <div className="a-meta">
           {reading && <span className="chip">{reading}</span>}
-          <div className="btn-group-responsive">
-            <a className="btn btn-responsive" href={a.url} target="_blank" rel="noreferrer">Original</a>
-            <Link className="btn btn-responsive" to={`/articles/${a.id}`}>Saved copy</Link>
-          </div>
+          <a className="btn" href={a.url} target="_blank" rel="noreferrer">Original</a>
+          <Link className="btn" to={`/articles/${a.id}`}>Saved copy</Link>
         </div>
       </div>
     </article>

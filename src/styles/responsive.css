@@ -127,6 +127,36 @@
   }
 }
 
+/* Preserve original app layout for articles page */
+.page:not(.container) {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Ensure proper spacing on all screen sizes */
+@media (min-width: 768px) {
+  .page:not(.container) {
+    padding: var(--space-lg);
+  }
+  
+  .j-toolbar {
+    margin-bottom: var(--space-md);
+  }
+  
+  /* Preserve original article grid layout */
+  .a-grid {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  
+  .a-hero {
+    grid-column: 1 / -1;
+  }
+}
+
 /* Responsive toolbar */
 .toolbar-responsive {
   display: flex;
@@ -220,6 +250,8 @@
 .m-responsive { margin: var(--space-md); }
 .m-responsive-sm { margin: var(--space-sm); }
 .m-responsive-lg { margin: var(--space-lg); }
+
+
 
 /* Responsive typography */
 .text-responsive-xs { font-size: var(--text-xs); }

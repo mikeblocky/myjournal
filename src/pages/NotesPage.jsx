@@ -108,7 +108,7 @@ export default function NotesPage(){
   }
 
   return (
-    <div className="fade-in page container">
+    <div className="fade-in page">
       <div className="j-toolbar toolbar-responsive">
         <div className="toolbar-left">
           <div className="kicker">Notes for {date}</div>

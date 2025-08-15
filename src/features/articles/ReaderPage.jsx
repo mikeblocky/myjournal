@@ -75,19 +75,17 @@ export default function ReaderPage() {
   const a = state.article;
 
   return (
-    <div className="reader-wrap fade-in page container">
+    <div className="reader-wrap fade-in page">
       <div className="reading-progress" style={{ transform: `scaleX(${progress})` }} />
 
       <article className="reader">
         <header className="reader-head">
-          <h2 className="reader-title text-responsive-xl">{a.title}</h2>
-          <div className="reader-meta flex-responsive-sm">
+          <h2 className="reader-title">{a.title}</h2>
+          <div className="reader-meta">
             {a.byline && <span className="chip">By {a.byline}</span>}
             <span className="chip">{hostFromUrl(a.url)}</span>
             <span className="chip">~{a.readingMins} min</span>
-            <div className="btn-group-responsive">
-              <a className="btn btn-responsive" href={a.url} target="_blank" rel="noreferrer">Original</a>
-            </div>
+            <a className="btn" href={a.url} target="_blank" rel="noreferrer">Original</a>
           </div>
         </header>
 
