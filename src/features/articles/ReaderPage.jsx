@@ -91,7 +91,7 @@ export default function ReaderPage() {
         <section className="ai-summary-section">
           <div className="ai-summary-header">
             <div className="ai-summary-title">
-              <span className="ai-chip">✨ AI Summary</span>
+              <span className="ai-chip">AI summary</span>
               <div className="ai-mode-indicator">
                 Mode: {aiState.mode.toUpperCase()}
               </div>
@@ -166,7 +166,6 @@ export default function ReaderPage() {
                 <div className="ai-summary-card">
                   <div className="summary-header">
                     <span className="summary-icon">Summary</span>
-                    <span className="summary-title">AI Generated Summary</span>
                   </div>
                   <div className="summary-content">
                     <div className="summary-text">{aiState.summary}</div>
@@ -176,8 +175,7 @@ export default function ReaderPage() {
             ) : (
               <div className="ai-prompt-card">
                 <div className="prompt-header">
-                  <span className="prompt-icon">💡</span>
-                  <span className="prompt-title">Ready to Summarize</span>
+                  <span className="prompt-title">Ready to summarize</span>
                 </div>
                 <div className="prompt-content">Choose a mode above to generate an AI-powered summary of this article.</div>
               </div>

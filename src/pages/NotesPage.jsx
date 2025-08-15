@@ -138,7 +138,7 @@ export default function NotesPage(){
               onClick={handleGenerateDaily} 
               disabled={daily.loading}
             >
-              {daily.loading ? "Summarizing…" : "Generate Summary"}
+              {daily.loading ? "Summarizing…" : "Generate summary"}
             </button>
           </div>
         </div>
