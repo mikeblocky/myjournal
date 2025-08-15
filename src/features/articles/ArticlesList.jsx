@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import * as api from "./articles.api";
+import { useArticlesList } from "../../hooks/useOptimizedFetch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import "../../styles/journal.css"; // reuse tokens + cards
 import "./articles.css";          // styles below
@@ -11,40 +12,57 @@ function initials(host=""){ const h = host.replace(/\.[a-z]+$/i,"").split(".").p
 
 export default function ArticlesList(){
   const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
-  const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [q, setQ] = useState("");
   const [source, setSource] = useState(""); // host filter
   const [diverse, setDiverse] = useState(true);
 
   const limit = 30;
 
-  async function load(p = 1){
-    if(!token) return;
-    setLoading(true); setErr("");
-    try{
-      const params = new URLSearchParams({ page: String(p), limit: String(limit), q });
-      const { items, total } = await api.list(token, Object.fromEntries(params));
-      setItems(items || []); setTotal(total || 0); setPage(p);
-    }catch(e){ setErr(e.message); }
-    finally{ setLoading(false); }
-  }
+  // Use optimized fetching hook
+  const { 
+    data, 
+    loading, 
+    error, 
+    refresh, 
+    isStale 
+  } = useArticlesList(token, {
+    page,
+    limit,
+    search: q,
+    immediate: !!token,
+    backgroundRefresh: false,
+    staleTime: 300000 // 5 minutes
+  });
 
-  useEffect(()=>{ if(token) load(1); }, [token]);        // initial
-  useEffect(()=>{ if(token) load(1); }, [q]);            // search
+  // Extract items and total from data
+  const items = data?.items || [];
+  const total = data?.total || 0;
 
-  async function onRefresh(){
+  // Debounced search to avoid excessive API calls
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId;
+      return (searchTerm) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setQ(searchTerm);
+        }, 300); // 300ms delay
+      };
+    })(),
+    []
+  );
+
+  const onRefresh = useCallback(async () => {
     if(!token) return;
-    setLoading(true);
     try{
-      // grab a few more for variety, force deep fetch
+      // Use optimized refresh with progress indication
       await api.refresh(token, 24, true);
-      await load(1);
-    }catch(e){ setErr(e.message); setLoading(false); }
-  }
+      refresh(); // Refresh the cached data
+    }catch(e){ 
+      console.error("Refresh failed:", e); 
+    }
+  }, [token, refresh]);
 
   // source list (chips)
   const hosts = useMemo(()=>{
@@ -73,13 +91,43 @@ export default function ArticlesList(){
   return (
     <div className="fade-in page">
       {/* toolbar */}
-      <div className="panel" style={{ padding: 12, display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
+      <div className="j-toolbar">
         <div className="kicker">Articles</div>
-        <form onSubmit={(e)=>{ e.preventDefault(); load(1); }} style={{ display:"flex", gap:8 }}>
-          <input placeholder="Search titles…" value={q} onChange={e=>setQ(e.target.value)} />
-          <button className="btn">Search</button>
+        <form onSubmit={(e)=>{ e.preventDefault(); }} style={{ display:"flex", gap:8 }}>
+          <input 
+            placeholder="Search titles…" 
+            defaultValue={q} 
+            onChange={e => debouncedSearch(e.target.value)} 
+          />
+          <button className="btn" type="button" onClick={() => refresh()}>Search</button>
         </form>
-        <div style={{ flex:1 }} />
+        {/* Performance indicators */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {isStale && (
+            <span className="kicker" style={{ 
+              color: "#f59e0b", 
+              padding: "4px 8px", 
+              background: "#fef3c7", 
+              borderRadius: "var(--radius-1)",
+              border: "1px solid #fbbf24"
+            }}>
+              Stale data
+            </span>
+          )}
+          {items.length > 0 && (
+            <span className="kicker" style={{ 
+              color: "#10b981", 
+              padding: "4px 8px", 
+              background: "#d1fae5", 
+              borderRadius: "var(--radius-1)",
+              border: "1px solid #34d399"
+            }}>
+              {items.length} articles
+            </span>
+          )}
+        </div>
+        
+        <div className="spacer" />
         <label className="ui-mono" style={{ display:"flex", alignItems:"center", gap:6 }}>
           <input type="checkbox" checked={diverse} onChange={e=>setDiverse(e.target.checked)} />
           Diversity by source
@@ -87,9 +135,17 @@ export default function ArticlesList(){
         <button className="btn" onClick={onRefresh}>Refresh sources</button>
       </div>
 
+      {/* Error display */}
+      {error && (
+        <div className="card" style={{ padding: 16, marginBottom: 12, border: "1px solid #fca5a5", background: "#fef2f2" }}>
+          <p style={{ color: "#dc2626", margin: "0 0 10px 0" }}>Error loading articles: {error}</p>
+          <button className="btn" onClick={refresh}>Retry</button>
+        </div>
+      )}
+
       {/* source chips */}
       {hosts.length > 0 && (
-        <div className="panel" style={{ padding: 12, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
+        <div className="j-toolbar">
           <span className="kicker">Sources</span>
           <button className={`chip ${!source ? "chip-active" : ""}`} onClick={()=>setSource("")}>All</button>
           {hosts.map(h => (

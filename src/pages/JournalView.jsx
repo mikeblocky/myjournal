@@ -92,7 +92,7 @@ export default function JournalView(){
         <h2 className="reader-title">{j.title || "Untitled"}</h2>
         <div className="reader-meta">
           <span className="chip">{timeAgo(j.date || j.createdAt)}</span>
-          {isOutline && <span className="chip" style={{ backgroundColor: "var(--accent)", color: "white" }}>📋 Outline</span>}
+          {isOutline && <span className="chip" style={{ backgroundColor: "var(--accent)", color: "white" }}>Outline</span>}
           {j.tags?.length ? <span className="chip">{j.tags.join(", ")}</span> : null}
           <Link className="btn" to="/journal">All journals</Link>
         </div>

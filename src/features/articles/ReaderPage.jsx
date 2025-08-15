@@ -165,7 +165,7 @@ export default function ReaderPage() {
               ) : (
                 <div className="ai-summary-card">
                   <div className="summary-header">
-                    <span className="summary-icon">📝</span>
+                    <span className="summary-icon">Summary</span>
                     <span className="summary-title">AI Generated Summary</span>
                   </div>
                   <div className="summary-content">

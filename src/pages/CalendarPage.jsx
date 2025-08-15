@@ -305,7 +305,7 @@ export default function CalendarPage(){
   return (
     <div className="calendar-page fade-in">
       {/* Toolbar */}
-      <div className="panel calendar-toolbar">
+      <div className="j-toolbar">
         <div className="kicker">Calendar</div>
         <div className="ui-mono month-year">
           {viewMode === "month" 
@@ -334,6 +334,7 @@ export default function CalendarPage(){
             </>
           )}
         </div>
+        
         <div className="spacer" />
         <div className="view-toggle">
           <button 
@@ -350,7 +351,7 @@ export default function CalendarPage(){
       {/* AI Day Plan */}
       <section className="ai-day-plan">
         <div className="ai-day-plan-header">
-          <span className="ai-chip">✨ Day Plan</span>
+          <span className="ai-chip">Day Plan</span>
           <span className="date">{selected}</span>
           <div className="spacer" />
           <button className="btn" onClick={onGeneratePlan} disabled={plan.loading}>
@@ -359,7 +360,7 @@ export default function CalendarPage(){
         </div>
         {plan.err && <p className="prose" style={{ color:"crimson" }}>{plan.err}</p>}
         {!plan.loading && plan.nothingToDo && (
-          <p className="prose" style={{ margin:0, opacity:0.9 }}>✨ Nothing scheduled today.</p>
+          <p className="prose" style={{ margin:0, opacity:0.9 }}>Nothing scheduled today.</p>
         )}
         {!plan.loading && !plan.nothingToDo && plan.item?.agenda?.length > 0 && (
           <ul className="prose">

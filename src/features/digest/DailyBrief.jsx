@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import * as api from "./digest.api";
 import * as articlesApi from "../articles/articles.api";
+import { useDailyDigest } from "../../hooks/useOptimizedFetch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import "./digest.css";
 
@@ -11,43 +12,78 @@ function hostFromUrl(u) { try { return new URL(u).host.replace(/^www\./, ""); } 
 
 export default function DailyBrief() {
     const { token } = useAuth();
-    const [state, setState] = useState({ loading: true, err: "", digest: null });
     const [length, setLength] = useState("detailed"); // "tldr" | "detailed"
+    
+    // Use optimized fetching hook
+    const { 
+        data: digestData, 
+        loading, 
+        error, 
+        refresh, 
+        isStale 
+    } = useDailyDigest(token, todayUTC(), {
+        immediate: !!token,
+        backgroundRefresh: true,
+        backgroundRefreshInterval: 60000, // 1 minute
+        staleTime: 300000 // 5 minutes
+    });
 
-    async function load() {
-        setState(s => ({ ...s, loading: true, err: "" }));
-        try {
-            const { item } = await api.getByDate(token, todayUTC());
-            if (item && item.items?.length) {
-                setState({ loading: false, err: "", digest: item });
-                return;
-            }
-            // missing or empty → refresh + generate once
-            const gen = await api.generate(token, todayUTC(), { limit: 12, refresh: true, length });
-            setState({ loading: false, err: "", digest: gen.item });
-        } catch (e) {
-            setState({ loading: false, err: e.message, digest: null });
+    // Smart loading state - show cached data immediately if available
+    const [state, setState] = useState({ 
+        loading: !digestData, 
+        err: error, 
+        digest: digestData?.item || null 
+    });
+
+    // Update state when data changes
+    useEffect(() => {
+        if (digestData?.item) {
+            setState({ loading: false, err: null, digest: digestData.item });
+        } else if (error) {
+            setState({ loading: false, err: error, digest: null });
         }
-    }
+    }, [digestData, error]);
 
-    useEffect(() => { if (token) load(); }, [token]);
+    // Auto-generate digest if none exists
+    useEffect(() => {
+        if (token && !loading && !state.digest && !state.err) {
+            handleGenerate({ refresh: true });
+        }
+    }, [token, loading, state.digest, state.err]);
 
-    async function handleGenerate(opts = {}) {
+    const handleGenerate = useCallback(async (opts = {}) => {
         setState(s => ({ ...s, loading: true }));
         try {
             const { item } = await api.generate(token, todayUTC(), { limit: 12, length, ...opts });
             setState({ loading: false, err: "", digest: item });
-        } catch (e) { setState({ loading: false, err: e.message, digest: null }); }
-    }
+            
+            // Refresh the cached data
+            refresh();
+        } catch (e) { 
+            setState({ loading: false, err: e.message, digest: null }); 
+        }
+    }, [token, length, refresh]);
 
-    async function handleRefreshAndGenerate() {
+    const handleRefreshAndGenerate = useCallback(async () => {
         setState(s => ({ ...s, loading: true }));
         try {
-            await articlesApi.refresh(token, 14, true); // hard refresh feeds
+            // Use optimized refresh with progress indication
+            const refreshPromise = articlesApi.refresh(token, 14, true);
+            
+            // Show refresh progress
+            setState(s => ({ ...s, loading: true, err: "Refreshing news sources..." }));
+            
+            await refreshPromise;
+            
             const { item } = await api.generate(token, todayUTC(), { limit: 12, refresh: false, length });
             setState({ loading: false, err: "", digest: item });
-        } catch (e) { setState({ loading: false, err: e.message, digest: null }); }
-    }
+            
+            // Refresh the cached data
+            refresh();
+        } catch (e) { 
+            setState({ loading: false, err: e.message, digest: null }); 
+        }
+    }, [token, length, refresh]);
 
     if (!token) return <p className="prose">Please <Link to="/login">log in</Link> to see your daily brief.</p>;
     if (state.loading) return <LoadingSpinner text="Loading daily brief..." variant="compact" />;
@@ -58,7 +94,7 @@ export default function DailyBrief() {
         <div className="fade-in">
             <h2 className="ui-mono" style={{ marginTop: 0 }}>Daily brief — {todayUTC()}</h2>
 
-            <div className="panel" style={{ padding: 12, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+            <div className="j-toolbar" style={{ marginBottom: 12 }}>
                 <div className="kicker">Controls</div>
                 <label className="ui-mono" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
                     Length:
@@ -67,7 +103,34 @@ export default function DailyBrief() {
                         <option value="tldr">Short TL;DR</option>
                     </select>
                 </label>
-                <div style={{ flex: 1 }} />
+                
+                {/* Performance indicators */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {isStale && (
+                        <span className="kicker" style={{ 
+                            color: "#f59e0b", 
+                            padding: "4px 8px", 
+                            background: "#fef3c7", 
+                            borderRadius: "var(--radius-1)",
+                            border: "1px solid #fbbf24"
+                        }}>
+                            Stale data
+                        </span>
+                    )}
+                    {state.digest && (
+                        <span className="kicker" style={{ 
+                            color: "#10b981", 
+                            padding: "4px 8px", 
+                            background: "#d1fae5", 
+                            borderRadius: "var(--radius-1)",
+                            border: "1px solid #34d399"
+                        }}>
+                            Fresh
+                        </span>
+                    )}
+                </div>
+                
+                <div className="spacer" />
                 <button className="btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
                 <button className="btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
             </div>
@@ -89,7 +152,7 @@ export default function DailyBrief() {
                     <section className="ai-tldr-section">
                         <div className="ai-tldr-header">
                             <div className="ai-tldr-title">
-                                <span className="ai-chip">✨ AI TL;DR</span>
+                                <span className="ai-chip">AI TL;DR</span>
                                 {!!d.topics?.length && (
                                     <div className="ai-topics">
                                         {d.topics.map((t, i) => <span key={i} className="topic-chip ui-mono">{t}</span>)}
@@ -109,7 +172,7 @@ export default function DailyBrief() {
                                 <div className="tldr-text">{d.tldr}</div>
                             ) : (
                                 <div className="tldr-empty">
-                                    <span className="empty-icon">📝</span>
+                                    <span className="empty-icon">Note</span>
                                     <span className="empty-text">No summary available.</span>
                                 </div>
                             )}

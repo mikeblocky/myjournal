@@ -107,38 +107,29 @@ export default function NotesPage(){
 
   return (
     <div className="fade-in" style={{ display:"grid", gap:16 }}>
-      <div className="toolbar-card">
-        <div className="toolbar-content">
-          <div className="toolbar-left">
-            <span className="toolbar-icon">📝</span>
-            <span className="toolbar-title">Notes</span>
-            <div className="date-selector">
-              <label className="date-label">
-                <span className="date-text">Date:</span>
-                <input 
-                  type="date" 
-                  value={date} 
-                  onChange={e=>setDate(e.target.value)}
-                  className="date-input"
-                />
-              </label>
-            </div>
-          </div>
-          
-          <div className="toolbar-right">
-            <button className="btn secondary" onClick={loadNotes}>
-              <span className="btn-icon">🔄</span>
-              <span className="btn-text">Reload</span>
-            </button>
-          </div>
+      <div className="j-toolbar">
+        <div className="kicker">Notes</div>
+        <div className="date-selector">
+          <label className="ui-mono" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            Date:
+            <input 
+              type="date" 
+              value={date} 
+              onChange={e=>setDate(e.target.value)}
+              style={{ width: "auto", padding: "8px 12px" }}
+            />
+          </label>
         </div>
+        
+        <div className="spacer" />
+        <button className="btn" onClick={loadNotes}>Reload</button>
       </div>
 
       {/* AI daily summary */}
       <section className="ai-summary-section">
         <div className="ai-summary-header">
           <div className="ai-summary-title">
-            <span className="ai-chip">✨ Daily AI Notes</span>
+            <span className="ai-chip">Daily AI Notes</span>
             <span className="ai-date">{date}</span>
           </div>
           <div className="ai-summary-controls">
@@ -156,7 +147,7 @@ export default function NotesPage(){
           {daily.err && (
             <div className="ai-error-card">
               <div className="error-header">
-                <span className="error-icon">⚠️</span>
+                <span className="error-icon">Error</span>
                 <span className="error-title">Error</span>
               </div>
               <div className="error-content">{daily.err}</div>
@@ -166,7 +157,7 @@ export default function NotesPage(){
           {!daily.loading && daily.nothingToDo && (list.length === 0) && (
             <div className="ai-empty-card">
               <div className="empty-header">
-                <span className="empty-icon">✨</span>
+                <span className="empty-icon">Empty</span>
                 <span className="empty-title">Nothing to do today</span>
               </div>
               <div className="empty-content">You have no notes for today.</div>
@@ -195,7 +186,7 @@ export default function NotesPage(){
           {!daily.loading && !daily.item && list.length > 0 && (
             <div className="ai-prompt-card">
               <div className="prompt-header">
-                <span className="prompt-icon">💡</span>
+                <span className="prompt-icon">Ready</span>
                 <span className="prompt-title">Ready to summarize</span>
               </div>
               <div className="prompt-content">Click "Generate Summary" to create an AI-powered summary of your notes.</div>
