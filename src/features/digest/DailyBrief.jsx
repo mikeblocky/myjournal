@@ -89,9 +89,15 @@ export default function DailyBrief() {
             if (storage) {
                 try {
                     const lastTry = storage.getItem(`digest-last-try-${today}`);
+                    const lastGenerated = storage.getItem(`digest-last-generated-${today}`);
                     const now = Date.now();
                     
-                    if (lastTry && (now - parseInt(lastTry)) <= 300000) { // 5 minutes
+                    // Check if we already generated today
+                    if (lastGenerated && lastGenerated === today) {
+                        shouldGenerate = false;
+                    }
+                    // Check if we tried recently (5 minutes)
+                    else if (lastTry && (now - parseInt(lastTry)) <= 300000) {
                         shouldGenerate = false;
                     } else if (lastTry) {
                         // Update timestamp
@@ -103,7 +109,7 @@ export default function DailyBrief() {
             }
             
             if (shouldGenerate) {
-                handleGenerate({ refresh: true });
+                handleGenerate({ refresh: false }); // Don't refresh news on auto-generation
             }
         }
     }, [token, loading, displayDigest, state.err]);
@@ -121,6 +127,16 @@ export default function DailyBrief() {
                 lastGenerated: new Date().toISOString()
             }));
             
+            // Track successful generation in localStorage
+            const storage = safeLocalStorage();
+            if (storage) {
+                try {
+                    storage.setItem(`digest-last-generated-${todayUTC()}`, todayUTC());
+                } catch (e) {
+                    console.warn('Failed to track generation:', e);
+                }
+            }
+            
             // Refresh the cached data in background
             setTimeout(() => refresh(), 100);
         } catch (e) { 
@@ -129,23 +145,41 @@ export default function DailyBrief() {
     }, [token, length, refresh]);
 
     const handleRefreshAndGenerate = useCallback(async () => {
-        setState(s => ({ ...s, loading: true }));
+        setState(s => ({ ...s, loading: true, err: "Refreshing news sources..." }));
         try {
-            // Use optimized refresh with progress indication
+            // Start news refresh in background (non-blocking)
             const refreshPromise = articlesApi.refresh(token, 14, true);
             
-            // Show refresh progress
-            setState(s => ({ ...s, loading: true, err: "Refreshing news sources..." }));
-            
-            await refreshPromise;
-            
+            // Generate digest with existing news (faster)
             const { item } = await api.generate(token, todayUTC(), { limit: 12, refresh: false, length });
-            setState({ loading: false, err: "", digest: item });
+            
+            // Update state immediately with new digest
+            setState(prev => ({ 
+                ...prev,
+                loading: false, 
+                err: "", 
+                digest: item,
+                lastGenerated: new Date().toISOString()
+            }));
+            
+            // Let news refresh complete in background
+            refreshPromise.then(() => {
+                // Only regenerate if news refresh was successful
+                api.generate(token, todayUTC(), { limit: 12, refresh: true, length })
+                    .then(({ item: freshItem }) => {
+                        setState(prev => ({ 
+                            ...prev, 
+                            digest: freshItem,
+                            lastGenerated: new Date().toISOString()
+                        }));
+                    })
+                    .catch(console.warn); // Silent fail for background update
+            }).catch(console.warn);
             
             // Refresh the cached data
             refresh();
         } catch (e) { 
-            setState({ loading: false, err: e.message, digest: null }); 
+            setState(prev => ({ ...prev, loading: false, err: e.message })); 
         }
     }, [token, length, refresh]);
 
@@ -225,8 +259,20 @@ export default function DailyBrief() {
                     </div>
                     
                     <div className="btn-group-responsive">
-                        <button className="ai-generate-btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
-                        <button className="ai-generate-btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
+                        <button 
+                            className="ai-generate-btn" 
+                            onClick={() => handleGenerate({ refresh: false })}
+                            disabled={state.loading}
+                        >
+                            {state.loading && state.err === "Refreshing news sources..." ? "Planning..." : "Regenerate"}
+                        </button>
+                        <button 
+                            className="ai-generate-btn" 
+                            onClick={handleRefreshAndGenerate}
+                            disabled={state.loading}
+                        >
+                            {state.loading && state.err === "Refreshing news sources..." ? "Refreshing..." : "Refresh news + regenerate"}
+                        </button>
                     </div>
                 </div>
             </div>

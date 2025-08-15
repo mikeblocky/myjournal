@@ -57,13 +57,16 @@ export default function ArticlesList(){
   const onRefresh = useCallback(async () => {
     if(!token) return;
     try{
-      // Use optimized refresh with progress indication
+      // Force refresh news sources first
       await api.refresh(token, 24, true);
-      refresh(); // Refresh the cached data
+      // Force a complete refresh of the articles list with fresh data
+      const freshData = await api.list(token, { page, limit, q, refresh: true });
+      // Update the cache with fresh data
+      refresh();
     }catch(e){ 
       console.error("Refresh failed:", e); 
     }
-  }, [token, refresh]);
+  }, [token, refresh, page, limit, q]);
 
   // Pagination function
   const load = useCallback((newPage) => {
