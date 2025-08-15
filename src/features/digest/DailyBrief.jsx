@@ -12,6 +12,24 @@ import "../../styles/responsive.css";
 function todayUTC() { return new Date().toISOString().slice(0, 10); }
 function hostFromUrl(u) { try { return new URL(u).host.replace(/^www\./, ""); } catch { return ""; } }
 
+// Safe localStorage wrapper
+function safeLocalStorage() {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return null;
+    }
+    
+    const testKey = '__test__';
+    window.localStorage.setItem(testKey, 'test');
+    window.localStorage.removeItem(testKey);
+    
+    return window.localStorage;
+  } catch (e) {
+    console.warn('localStorage not available:', e);
+    return null;
+  }
+}
+
 export default function DailyBrief() {
     const { token } = useAuth();
     const [length, setLength] = useState("detailed"); // "tldr" | "detailed"
@@ -64,27 +82,27 @@ export default function DailyBrief() {
             // Check if we already tried to generate today
             const today = todayUTC();
             
-            // Safe localStorage check
-            const canUseStorage = typeof window !== 'undefined' && 
-                                 window.localStorage && 
-                                 typeof window.localStorage.setItem === 'function' &&
-                                 typeof window.localStorage.getItem === 'function';
+            // Use safe localStorage wrapper
+            const storage = safeLocalStorage();
+            let shouldGenerate = true;
             
-            if (canUseStorage) {
+            if (storage) {
                 try {
-                    const lastTry = localStorage.getItem(`digest-last-try-${today}`);
+                    const lastTry = storage.getItem(`digest-last-try-${today}`);
                     const now = Date.now();
                     
-                    if (!lastTry || (now - parseInt(lastTry)) > 300000) { // 5 minutes
-                        localStorage.setItem(`digest-last-try-${today}`, now.toString());
-                        handleGenerate({ refresh: true });
+                    if (lastTry && (now - parseInt(lastTry)) <= 300000) { // 5 minutes
+                        shouldGenerate = false;
+                    } else if (lastTry) {
+                        // Update timestamp
+                        storage.setItem(`digest-last-try-${today}`, now.toString());
                     }
                 } catch (e) {
-                    console.warn('localStorage error, proceeding with generation:', e);
-                    handleGenerate({ refresh: true });
+                    console.warn('localStorage operation failed, proceeding with generation:', e);
                 }
-            } else {
-                // Fallback if localStorage is not available
+            }
+            
+            if (shouldGenerate) {
                 handleGenerate({ refresh: true });
             }
         }
