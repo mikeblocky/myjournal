@@ -131,12 +131,34 @@ export default function ReaderPage() {
                   </div>
                   <div className="summary-content">
                     <ul className="summary-bullets">
-                      {aiState.summary.split("\n").map((line, i) => (
-                        <li key={i} className="summary-bullet">
-                          <span className="bullet-marker">•</span>
-                          <span className="bullet-text">{line.replace(/^[-•\s]+/, "")}</span>
-                        </li>
-                      ))}
+                      {aiState.summary
+                        .split(/\n|(?=•\s)/) // Split on newlines OR before bullet markers
+                        .map((line, i) => {
+                          const trimmed = line.trim();
+                          // Skip empty lines
+                          if (!trimmed) return null;
+                          
+                          // Check if this line starts with a bullet marker
+                          const bulletMatch = trimmed.match(/^[•\-\*]\s*(.+)/);
+                          if (bulletMatch) {
+                            return (
+                              <li key={i} className="summary-bullet">
+                                <span className="bullet-marker">•</span>
+                                <span className="bullet-text">{bulletMatch[1].trim()}</span>
+                              </li>
+                            );
+                          }
+                          
+                          // If no bullet marker, treat as regular text (fallback)
+                          return (
+                            <li key={i} className="summary-bullet">
+                              <span className="bullet-marker">•</span>
+                              <span className="bullet-text">{trimmed}</span>
+                            </li>
+                          );
+                        })
+                        .filter(Boolean) // Remove null entries
+                      }
                     </ul>
                   </div>
                 </div>

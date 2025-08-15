@@ -199,24 +199,31 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .summary-bullet {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 0; /* Remove margin since we're using gap */
+  line-height: 1.4;
 }
 
 .summary-bullet .bullet-marker {
   font-size: 0.8rem;
   color: var(--accent);
+  flex-shrink: 0; /* Prevent bullet from shrinking */
+  margin-top: 2px; /* Align with text baseline */
 }
 
 .summary-bullet .bullet-text {
   font-size: 0.9rem;
   color: var(--text);
   line-height: 1.4;
+  flex: 1; /* Take remaining space */
 }
 
 .ai-loading-card .loading-spinner {
