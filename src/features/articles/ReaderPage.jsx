@@ -6,6 +6,8 @@ import * as ai from "../ai/ai.api";
 import { sanitizeArticle } from "../../lib/sanitize";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import "../../styles/reader.css";
+import "../../styles/ai.css";
+import "../../styles/responsive.css";
 
 function hostFromUrl(u) {
   try { return new URL(u).host.replace(/^www\./, ""); } catch { return ""; }
@@ -73,121 +75,96 @@ export default function ReaderPage() {
   const a = state.article;
 
   return (
-    <div className="reader-wrap fade-in">
+    <div className="reader-wrap fade-in page container">
       <div className="reading-progress" style={{ transform: `scaleX(${progress})` }} />
 
       <article className="reader">
         <header className="reader-head">
-          <h2 className="reader-title">{a.title}</h2>
-          <div className="reader-meta">
+          <h2 className="reader-title text-responsive-xl">{a.title}</h2>
+          <div className="reader-meta flex-responsive-sm">
             {a.byline && <span className="chip">By {a.byline}</span>}
             <span className="chip">{hostFromUrl(a.url)}</span>
             <span className="chip">~{a.readingMins} min</span>
-            <a className="btn" href={a.url} target="_blank" rel="noreferrer">Original</a>
+            <div className="btn-group-responsive">
+              <a className="btn btn-responsive" href={a.url} target="_blank" rel="noreferrer">Original</a>
+            </div>
           </div>
         </header>
 
-        {/* AI Summary (rainbow glow card) */}
-        <section className="ai-summary-section">
-          <div className="ai-summary-header">
-            <div className="ai-summary-title">
-              <span className="ai-chip">AI summary</span>
+        {/* AI Summary with unified design */}
+        <section className="ai-component ai-responsive">
+          <div className="ai-header">
+            <div className="ai-title">
+              <span className="ai-icon">✨</span>
+              <h3 className="ai-label">AI Summary</h3>
               <div className="ai-mode-indicator">
                 Mode: {aiState.mode.toUpperCase()}
               </div>
             </div>
-            <div className="ai-summary-controls">
-              <div className="mode-buttons">
-                <button className="btn" onClick={() => runAISummary("tldr")} disabled={aiState.loading}>
-                  TL;DR
+            <div className="ai-controls">
+              <div className="ai-mode-buttons">
+                <button 
+                  className={`ai-mode-btn ${aiState.mode === "tldr" ? "active" : ""}`}
+                  onClick={() => runAISummary("tldr")} 
+                  disabled={aiState.loading}
+                >
+                  {aiState.loading && aiState.mode === "tldr" ? "Generating..." : "TL;DR"}
                 </button>
-                <button className="btn" onClick={() => runAISummary("detailed")} disabled={aiState.loading}>
-                  Detailed
+                <button 
+                  className={`ai-mode-btn ${aiState.mode === "detailed" ? "active" : ""}`}
+                  onClick={() => runAISummary("detailed")} 
+                  disabled={aiState.loading}
+                >
+                  {aiState.loading && aiState.mode === "detailed" ? "Generating..." : "Detailed"}
                 </button>
-                <button className="btn" onClick={() => runAISummary("outline")} disabled={aiState.loading}>
-                  Outline
+                <button 
+                  className={`ai-mode-btn ${aiState.mode === "outline" ? "active" : ""}`}
+                  onClick={() => runAISummary("outline")} 
+                  disabled={aiState.loading}
+                >
+                  {aiState.loading && aiState.mode === "outline" ? "Generating..." : "Outline"}
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="ai-summary-content">
+          <div className="ai-content">
+            {aiState.loading && (
+              <div className="ai-loading">
+                <LoadingSpinner text="Generating AI summary..." variant="compact" />
+              </div>
+            )}
+
             {aiState.err && (
-              <div className="ai-error-card">
-                <div className="error-header">
-                  <span className="error-icon">⚠️</span>
-                  <span className="error-title">Error</span>
-                </div>
-                <div className="error-content">{aiState.err}</div>
+              <div className="ai-error">
+                <p>Error: {aiState.err}</p>
               </div>
             )}
 
             {!aiState.err && aiState.summary ? (
               aiState.mode === "outline" ? (
                 <div className="ai-summary-card">
-                  <div className="summary-header">
-                    <span className="summary-icon">📋</span>
-                    <span className="summary-title">AI Generated Outline</span>
-                  </div>
-                  <div className="summary-content">
-                    <ul className="summary-bullets">
-                      {aiState.summary
-                        .split(/\n|(?=•\s)/) // Split on newlines OR before bullet markers
-                        .map((line, i) => {
-                          const trimmed = line.trim();
-                          // Skip empty lines
-                          if (!trimmed) return null;
-                          
-                          // Check if this line starts with a bullet marker
-                          const bulletMatch = trimmed.match(/^[•\-\*]\s*(.+)/);
-                          if (bulletMatch) {
-                            return (
-                              <li key={i} className="summary-bullet">
-                                <span className="bullet-marker">•</span>
-                                <span className="bullet-text">{bulletMatch[1].trim()}</span>
-                              </li>
-                            );
-                          }
-                          
-                          // If no bullet marker, treat as regular text (fallback)
-                          return (
-                            <li key={i} className="summary-bullet">
-                              <span className="bullet-marker">•</span>
-                              <span className="bullet-text">{trimmed}</span>
-                            </li>
-                          );
-                        })
-                        .filter(Boolean) // Remove null entries
-                      }
-                    </ul>
+                  <div className="ai-summary-title">AI Generated Outline</div>
+                  <div className="ai-summary-text">
+                    {aiState.summary
+                      .split('\n')
+                      .filter(line => line.trim())
+                      .map((line, i) => (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          {line}
+                        </div>
+                      ))}
                   </div>
                 </div>
               ) : (
                 <div className="ai-summary-card">
-                  <div className="summary-header">
-                    <span className="summary-icon">Summary</span>
-                  </div>
-                  <div className="summary-content">
-                    <div className="summary-text">{aiState.summary}</div>
-                  </div>
+                  <div className="ai-summary-title">AI Generated Summary</div>
+                  <div className="ai-summary-text">{aiState.summary}</div>
                 </div>
               )
             ) : (
-              <div className="ai-prompt-card">
-                <div className="prompt-header">
-                  <span className="prompt-title">Ready to summarize</span>
-                </div>
-                <div className="prompt-content">Choose a mode above to generate an AI-powered summary of this article.</div>
-              </div>
-            )}
-
-            {aiState.loading && (
-              <div className="ai-loading-card">
-                <div className="loading-header">
-                  <div className="loading-spinner"></div>
-                  <span className="loading-title">Generating Summary</span>
-                </div>
-                <div className="loading-content">Analyzing article content and generating insights...</div>
+              <div className="ai-prompt">
+                <div className="ai-prompt-content">Choose a mode above to generate an AI-powered summary of this article.</div>
               </div>
             )}
           </div>

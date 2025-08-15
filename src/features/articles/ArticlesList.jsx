@@ -5,6 +5,7 @@ import * as api from "./articles.api";
 import { useArticlesList } from "../../hooks/useOptimizedFetch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import "../../styles/journal.css"; // reuse tokens + cards
+import "../../styles/responsive.css"; // responsive design system
 import "./articles.css";          // styles below
 
 function hostFromUrl(u){ try{ return new URL(u).host.replace(/^www\./,""); } catch { return ""; } }
@@ -94,50 +95,57 @@ export default function ArticlesList(){
   }, [items, source, diverse]);
 
   return (
-    <div className="fade-in page">
-      {/* toolbar */}
-      <div className="j-toolbar">
-        <div className="kicker">Articles</div>
-        <form onSubmit={(e)=>{ e.preventDefault(); }} style={{ display:"flex", gap:8 }}>
-          <input 
-            placeholder="Search titles…" 
-            defaultValue={q} 
-            onChange={e => debouncedSearch(e.target.value)} 
-          />
-          <button className="btn" type="button" onClick={() => refresh()}>Search</button>
-        </form>
-        {/* Performance indicators */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {isStale && (
-            <span className="kicker" style={{ 
-              color: "#f59e0b", 
-              padding: "4px 8px", 
-              background: "#fef3c7", 
-              borderRadius: "var(--radius-1)",
-              border: "1px solid #fbbf24"
-            }}>
-              Stale data
-            </span>
-          )}
-          {items.length > 0 && (
-            <span className="kicker" style={{ 
-              color: "#10b981", 
-              padding: "4px 8px", 
-              background: "#d1fae5", 
-              borderRadius: "var(--radius-1)",
-              border: "1px solid #34d399"
-            }}>
-              {items.length} articles
-            </span>
-          )}
+    <div className="fade-in page container">
+      {/* responsive toolbar */}
+      <div className="j-toolbar toolbar-responsive">
+        <div className="toolbar-left">
+          <div className="kicker">Articles</div>
+          <form onSubmit={(e)=>{ e.preventDefault(); }} className="search-responsive">
+            <input 
+              className="input-responsive"
+              placeholder="Search titles…" 
+              defaultValue={q} 
+              onChange={e => debouncedSearch(e.target.value)} 
+            />
+            <button className="btn btn-responsive" type="button" onClick={() => refresh()}>Search</button>
+          </form>
         </div>
         
-        <div className="spacer" />
-        <label className="ui-mono" style={{ display:"flex", alignItems:"center", gap:6 }}>
-          <input type="checkbox" checked={diverse} onChange={e=>setDiverse(e.target.checked)} />
-          Diversity by source
-        </label>
-        <button className="btn" onClick={onRefresh}>Refresh sources</button>
+        <div className="toolbar-right">
+          {/* Performance indicators */}
+          <div className="flex-responsive-sm">
+            {isStale && (
+              <span className="kicker" style={{ 
+                color: "#f59e0b", 
+                padding: "4px 8px", 
+                background: "#fef3c7", 
+                borderRadius: "var(--radius-1)",
+                border: "1px solid #fbbf24"
+              }}>
+                Stale data
+              </span>
+            )}
+            {items.length > 0 && (
+              <span className="kicker" style={{ 
+                color: "#10b981", 
+                padding: "4px 8px", 
+                background: "#d1fae5", 
+                borderRadius: "var(--radius-1)",
+                border: "1px solid #34d399"
+              }}>
+                {items.length} articles
+              </span>
+            )}
+          </div>
+          
+          <div className="flex-responsive-sm">
+            <label className="ui-mono" style={{ display:"flex", alignItems:"center", gap:6 }}>
+              <input type="checkbox" checked={diverse} onChange={e=>setDiverse(e.target.checked)} />
+              Diversity by source
+            </label>
+            <button className="btn btn-responsive" onClick={onRefresh}>Refresh sources</button>
+          </div>
+        </div>
       </div>
 
       {/* Error display */}
@@ -148,34 +156,52 @@ export default function ArticlesList(){
         </div>
       )}
 
-      {/* source chips */}
+            {/* source chips */}
       {hosts.length > 0 && (
-        <div className="j-toolbar">
-          <span className="kicker">Sources</span>
-          <button className={`chip ${!source ? "chip-active" : ""}`} onClick={()=>setSource("")}>All</button>
-          {hosts.map(h => (
-            <button key={h} className={`chip ${source===h?"chip-active":""}`} onClick={()=>setSource(h)}>{h}</button>
-          ))}
+        <div className="j-toolbar toolbar-responsive">
+          <div className="toolbar-left">
+            <span className="kicker">Sources</span>
+            <div className="flex-responsive-sm">
+              <button className={`chip ${!source ? "chip-active" : ""}`} onClick={()=>setSource("")}>All</button>
+              {hosts.map(h => (
+                <button key={h} className={`chip ${source===h?"chip-active":""}`} onClick={()=>setSource(h)}>{h}</button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
-
-      {loading ? <LoadingSpinner text="Loading articles..." variant="compact" /> : (
-        filtered.length === 0 ? <p className="prose">No articles found.</p> : (
-          <section className="a-grid">
-            {/* Hero card (first item) */}
-            {filtered[0] && <ArticleCard a={filtered[0]} hero />}
-            {/* Rest */}
-            {filtered.slice(1).map(a => <ArticleCard key={a.id} a={a} />)}
-          </section>
-        )
+      {/* Error display */}
+      {error && (
+        <div className="card error-responsive" style={{ border: "1px solid #fca5a5", background: "#fef2f2" }}>
+          <p style={{ color: "#dc2626", margin: "0 0 10px 0" }}>Error loading articles: {error}</p>
+          <button className="btn btn-responsive" onClick={refresh}>Retry</button>
+        </div>
       )}
 
-      {/* simple pager */}
-      <div style={{ display:"flex", gap:8, alignItems:"center", justifyContent:"center" }}>
-        <button className="btn" disabled={page<=1} onClick={()=>load(page-1)}>Prev</button>
+      {/* Main content */}
+      {loading ? (
+        <div className="loading-responsive">
+          <LoadingSpinner text="Loading articles..." variant="compact" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="empty-responsive">
+          <p className="prose">No articles found.</p>
+        </div>
+      ) : (
+        <section className="content-grid-responsive">
+          {/* Hero card (first item) */}
+          {filtered[0] && <ArticleCard a={filtered[0]} hero />}
+          {/* Rest */}
+          {filtered.slice(1).map(a => <ArticleCard key={a.id} a={a} />)}
+        </section>
+      )}
+
+      {/* responsive pager */}
+      <div className="pagination-responsive">
+        <button className="btn btn-responsive" disabled={page<=1} onClick={()=>load(page-1)}>Prev</button>
         <span className="kicker">Page {page}</span>
-        <button className="btn" disabled={filtered.length < limit} onClick={()=>load(page+1)}>Next</button>
+        <button className="btn btn-responsive" disabled={filtered.length < limit} onClick={()=>load(page+1)}>Next</button>
       </div>
     </div>
   );
@@ -185,12 +211,12 @@ function ArticleCard({ a, hero=false }){
   const host = hostFromUrl(a.url);
   const img = a.imageUrl || "";
   const reading = a.readingMins ? `~${a.readingMins} min` : "";
-  const className = hero ? "a-card a-hero card" : "a-card card";
+  const className = hero ? "a-card a-hero card card-responsive card-shadow-responsive" : "a-card card card-responsive card-shadow-responsive";
   return (
     <article className={className}>
       <div className="a-imgwrap">
         {img ? (
-          <img className="a-img" src={img} alt="" loading="lazy" />
+          <img className="a-img img-responsive-hero" src={img} alt="" loading="lazy" />
         ) : (
           <div className="a-img a-placeholder">
             <span className="ui-mono">{initials(host || "news")}</span>
@@ -200,12 +226,14 @@ function ArticleCard({ a, hero=false }){
       </div>
 
       <div className="a-body">
-        <Link to={`/articles/${a.id}`} className="a-title ui-mono">{a.title || "(untitled)"}</Link>
-        {a.excerpt && <p className="prose a-excerpt">{a.excerpt}</p>}
-        <div className="a-meta">
+        <Link to={`/articles/${a.id}`} className="a-title ui-mono text-responsive-lg">{a.title || "(untitled)"}</Link>
+        {a.excerpt && <p className="prose a-excerpt text-responsive-base">{a.excerpt}</p>}
+        <div className="a-meta flex-responsive-sm">
           {reading && <span className="chip">{reading}</span>}
-          <a className="btn" href={a.url} target="_blank" rel="noreferrer">Original</a>
-          <Link className="btn" to={`/articles/${a.id}`}>Saved copy</Link>
+          <div className="btn-group-responsive">
+            <a className="btn btn-responsive" href={a.url} target="_blank" rel="noreferrer">Original</a>
+            <Link className="btn btn-responsive" to={`/articles/${a.id}`}>Saved copy</Link>
+          </div>
         </div>
       </div>
     </article>

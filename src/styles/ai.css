@@ -1,0 +1,319 @@
+/* AI Design System - Unified styling for all AI components */
+
+/* Rainbow gradient variables */
+:root {
+  --ai-rainbow-1: #ff6b6b;  /* coral */
+  --ai-rainbow-2: #feca57;  /* yellow */
+  --ai-rainbow-3: #48dbfb;  /* blue */
+  --ai-rainbow-4: #ff9ff3;  /* pink */
+  --ai-rainbow-5: #54a0ff;  /* blue */
+  --ai-rainbow-6: #5f27cd;  /* purple */
+}
+
+/* Base AI component styling */
+.ai-component {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2);
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ai-component:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Rainbow top border effect */
+.ai-component::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--ai-rainbow-1) 0%,
+    var(--ai-rainbow-2) 16.66%,
+    var(--ai-rainbow-3) 33.33%,
+    var(--ai-rainbow-4) 50%,
+    var(--ai-rainbow-5) 66.66%,
+    var(--ai-rainbow-6) 83.33%,
+    var(--ai-rainbow-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: ai-rainbow-flow 8s ease-in-out infinite;
+}
+
+/* Rainbow flow animation */
+@keyframes ai-rainbow-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* AI Header Section */
+.ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+
+.ai-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--ai-rainbow-3), var(--ai-rainbow-4));
+  border-radius: 50%;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-label {
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.ai-mode-indicator {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 4px 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-1);
+  font-family: var(--font-ui);
+}
+
+/* AI Controls */
+.ai-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-mode-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.ai-mode-btn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-1);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-ui);
+}
+
+.ai-mode-btn:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.ai-mode-btn.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* AI Content Area */
+.ai-content {
+  min-height: 100px;
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.ai-error {
+  padding: 16px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-1);
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.ai-success {
+  padding: 16px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-1);
+  color: #166534;
+  margin-bottom: 16px;
+}
+
+/* AI Summary Card */
+.ai-summary-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-1);
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--ai-rainbow-1),
+    var(--ai-rainbow-2),
+    var(--ai-rainbow-3),
+    var(--ai-rainbow-4)
+  );
+  background-size: 200% 100%;
+  animation: ai-rainbow-flow 6s ease-in-out infinite;
+}
+
+.ai-summary-title {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-summary-title::before {
+  content: '✨';
+  font-size: 1rem;
+}
+
+.ai-summary-text {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* AI Prompt Area */
+.ai-prompt {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.ai-prompt-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* AI Generate Button */
+.ai-generate-btn {
+  background: linear-gradient(135deg, var(--ai-rainbow-3), var(--ai-rainbow-4));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-1);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ai-generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ai-generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* AI Status Indicators */
+.ai-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.ai-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ai-rainbow-3);
+  animation: ai-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ai-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .ai-controls {
+    justify-content: center;
+  }
+  
+  .ai-mode-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Dark theme adjustments */
+html[data-theme="dark"] .ai-component {
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+html[data-theme="dark"] .ai-summary-card {
+  background: var(--panel);
+  border-color: var(--border);
+}

@@ -6,6 +6,8 @@ import * as articlesApi from "../articles/articles.api";
 import { useDailyDigest } from "../../hooks/useOptimizedFetch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import "./digest.css";
+import "../../styles/ai.css";
+import "../../styles/responsive.css";
 
 function todayUTC() { return new Date().toISOString().slice(0, 10); }
 function hostFromUrl(u) { try { return new URL(u).host.replace(/^www\./, ""); } catch { return ""; } }
@@ -92,56 +94,63 @@ export default function DailyBrief() {
     const d = state.digest;
 
     return (
-        <div className="fade-in">
-            <h2 className="ui-mono" style={{ marginTop: 0 }}>Daily brief — {todayUTC()}</h2>
+        <div className="fade-in page container">
+            <h2 className="ui-mono text-responsive-xl" style={{ marginTop: 0 }}>Daily brief — {todayUTC()}</h2>
 
-            <div className="j-toolbar" style={{ marginBottom: 12 }}>
-                <div className="kicker">Controls</div>
-                <label className="ui-mono" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                    Length:
-                    <select value={length} onChange={e => setLength(e.target.value)} className="ui-mono">
-                        <option value="detailed">Detailed</option>
-                        <option value="tldr">Short TL;DR</option>
-                    </select>
-                </label>
-                
-                {/* Performance indicators */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {isStale && (
-                        <span className="kicker" style={{ 
-                            color: "#f59e0b", 
-                            padding: "4px 8px", 
-                            background: "#fef3c7", 
-                            borderRadius: "var(--radius-1)",
-                            border: "1px solid #fbbf24"
-                        }}>
-                            Stale data
-                        </span>
-                    )}
-                    {state.digest && (
-                        <span className="kicker" style={{ 
-                            color: "#10b981", 
-                            padding: "4px 8px", 
-                            background: "#d1fae5", 
-                            borderRadius: "var(--radius-1)",
-                            border: "1px solid #34d399"
-                        }}>
-                            Fresh
-                        </span>
-                    )}
+            <div className="j-toolbar toolbar-responsive" style={{ marginBottom: 12 }}>
+                <div className="toolbar-left">
+                    <div className="kicker">Controls</div>
+                    <div className="search-responsive">
+                        <label className="ui-mono" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                            Length:
+                            <select value={length} onChange={e => setLength(e.target.value)} className="ui-mono input-responsive">
+                                <option value="detailed">Detailed</option>
+                                <option value="detailed">Short TL;DR</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 
-                <div className="spacer" />
-                <button className="btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
-                <button className="btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
+                <div className="toolbar-right">
+                    {/* Performance indicators */}
+                    <div className="flex-responsive-sm">
+                        {isStale && (
+                            <span className="kicker" style={{ 
+                                color: "#f59e0b", 
+                                padding: "4px 8px", 
+                                background: "#fef3c7", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #fbbf24"
+                            }}>
+                                Stale data
+                            </span>
+                        )}
+                        {state.digest && (
+                            <span className="kicker" style={{ 
+                                color: "#10b981", 
+                                padding: "4px 8px", 
+                                background: "#d1fae5", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #34d399"
+                            }}>
+                                Fresh
+                            </span>
+                        )}
+                    </div>
+                    
+                    <div className="btn-group-responsive">
+                        <button className="ai-generate-btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
+                        <button className="ai-generate-btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
+                    </div>
+                </div>
             </div>
 
             {!d && (
                 <div className="card" style={{ padding: 16 }}>
                     <p className="prose" style={{ margin: "0 0 12px 0" }}>No digest yet today.</p>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        <button className="btn primary" onClick={() => handleGenerate({ refresh: true })}>Generate digest</button>
-                        <button className="btn" onClick={handleRefreshAndGenerate}>Refresh news + generate</button>
+                        <button className="ai-generate-btn" onClick={() => handleGenerate({ refresh: true })}>Generate digest</button>
+                        <button className="ai-generate-btn" onClick={handleRefreshAndGenerate}>Refresh news + generate</button>
                     </div>
                     {state.err && <p style={{ color: "crimson" }}>{state.err}</p>}
                 </div>
@@ -149,32 +158,48 @@ export default function DailyBrief() {
 
             {d && (
                 <>
-                    {/* AI TL;DR with rainbow glow */}
-                    <section className="ai-tldr-section">
-                        <div className="ai-tldr-header">
-                            <div className="ai-tldr-title">
-                                <span className="ai-chip">AI TL;DR</span>
+                    {/* AI TL;DR with unified design */}
+                    <section className="ai-component ai-responsive">
+                        <div className="ai-header">
+                            <div className="ai-title">
+                                <span className="ai-icon">📰</span>
+                                <h3 className="ai-label">AI TL;DR</h3>
                                 {!!d.topics?.length && (
-                                    <div className="ai-topics">
-                                        {d.topics.map((t, i) => <span key={i} className="topic-chip ui-mono">{t}</span>)}
+                                    <div className="ai-mode-indicator">
+                                        {d.topics.slice(0, 3).join(", ")}
                                     </div>
                                 )}
                             </div>
-                            <div className="ai-tldr-meta">
-                                <span className="meta-label">Sources:</span>
-                                <div className="source-chips">
-                                    {(d.sources || []).map((s, i) => <span key={i} className="source-chip ui-mono">{s}</span>)}
+                            <div className="ai-controls">
+                                <div className="ai-status">
+                                    <span className="ai-status-dot"></span>
+                                    <span>AI Generated</span>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="ai-tldr-content">
+                        <div className="ai-content">
                             {d.tldr ? (
-                                <div className="tldr-text">{d.tldr}</div>
+                                <div className="ai-summary-card">
+                                    <div className="ai-summary-title">Daily Brief Summary</div>
+                                    <div className="ai-summary-text">{d.tldr}</div>
+                                </div>
                             ) : (
-                                <div className="tldr-empty">
-                                    <span className="empty-icon">Note</span>
-                                    <span className="empty-text">No summary available.</span>
+                                <div className="ai-prompt">
+                                    <div className="ai-prompt-content">No summary available.</div>
+                                </div>
+                            )}
+                            
+                            {!!d.sources?.length && (
+                                <div className="ai-summary-card">
+                                    <div className="ai-summary-title">Sources</div>
+                                    <div className="ai-summary-text">
+                                        {d.sources.map((s, i) => (
+                                            <div key={i} style={{ marginBottom: '4px' }}>
+                                                • {s}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>

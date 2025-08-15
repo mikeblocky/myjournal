@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import * as aiApi from "../ai/ai.api";
+import "../../styles/ai.css";
+import "../../styles/responsive.css";
 
 function toYMD(d) {
   if (!d) return new Date().toISOString().slice(0,10);
@@ -142,58 +144,65 @@ export default function JournalEditor({ entry, onSave, onDelete, saving=false })
   }
 
   return (
-    <div className="panel" style={{ padding: 16, display: "grid", gap: 10 }}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <label>Title</label>
-        <input
-          className="ui-mono"
-          placeholder="Untitled journal"
-          value={title}
-          onChange={e=>setTitle(e.target.value)}
-        />
-      </div>
+    <div className="panel form-responsive-single" style={{ padding: 16 }}>
+      <div className="form-responsive">
+        <div style={{ display: "grid", gap: 6 }}>
+          <label>Title</label>
+          <input
+            className="ui-mono input-responsive"
+            placeholder="Untitled journal"
+            value={title}
+            onChange={e=>setTitle(e.target.value)}
+          />
+        </div>
 
-      <div style={{ display: "grid", gap: 6 }}>
-        <label>Date</label>
-        <input type="date" value={date} onChange={e=>setDate(e.target.value)} />
-      </div>
+        <div style={{ display: "grid", gap: 6 }}>
+          <label>Date</label>
+          <input type="date" value={date} onChange={e=>setDate(e.target.value)} className="input-responsive" />
+        </div>
 
-      <div style={{ display: "grid", gap: 6 }}>
-        <label>Tags (comma separated)</label>
-        <input placeholder="life, reading, class" value={tags} onChange={e=>setTags(e.target.value)} />
+        <div style={{ display: "grid", gap: 6 }}>
+          <label>Tags (comma separated)</label>
+          <input placeholder="life, reading, class" value={tags} onChange={e=>setTags(e.target.value)} className="input-responsive" />
+        </div>
       </div>
 
       {/* Mode Toggle */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <label style={{ margin: 0 }}>Mode:</label>
-        <div className="mode-toggle">
-          <button
-            type="button"
-            className={`btn ${mode === "write" ? "primary" : ""}`}
-            onClick={() => setMode("write")}
-            title="Write mode - traditional paragraph writing"
-          >
-            Write
-          </button>
-          <button
-            type="button"
-            className={`btn ${mode === "outline" ? "primary" : ""}`}
-            onClick={() => setMode("outline")}
-            title="Outline mode - bullet point organization"
-          >
-            Outline
-          </button>
+      <div className="toolbar-responsive">
+        <div className="toolbar-left">
+          <label style={{ margin: 0 }}>Mode:</label>
+          <div className="btn-group-responsive">
+            <button
+              type="button"
+              className={`btn btn-responsive ${mode === "write" ? "primary" : ""}`}
+              onClick={() => setMode("write")}
+              title="Write mode - traditional paragraph writing"
+            >
+              Write
+            </button>
+            <button
+              type="button"
+              className={`btn btn-responsive ${mode === "outline" ? "primary" : ""}`}
+              onClick={() => setMode("outline")}
+              title="Outline mode - bullet point organization"
+            >
+              Outline
+            </button>
+          </div>
         </div>
+        
         {mode === "outline" && (
-          <button
-            type="button"
-            className="btn ai-outline-btn"
-            onClick={generateOutline}
-            disabled={aiLoading || !body.trim() || !token}
-            title="Generate AI-powered outline from your text"
-          >
-            {aiLoading ? "Generating..." : "✨ AI Outline"}
-          </button>
+          <div className="toolbar-right">
+            <button
+              type="button"
+              className="ai-generate-btn"
+              onClick={generateOutline}
+              disabled={aiLoading || !body.trim() || !token}
+              title="Generate AI-powered outline from your text"
+            >
+              {aiLoading ? "Generating..." : "✨ AI Outline"}
+            </button>
+          </div>
         )}
       </div>
 
@@ -248,11 +257,16 @@ export default function JournalEditor({ entry, onSave, onDelete, saving=false })
         )}
       </div>
 
-      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-        {!isNew && <button className="btn" onClick={onDelete}>Delete</button>}
-        <button className="btn primary" onClick={handleSave} disabled={saving}>
-          {saving ? "Saving…" : (isNew ? "Create journal" : "Save changes")}
-        </button>
+      <div className="toolbar-responsive">
+        <div className="toolbar-left"></div>
+        <div className="toolbar-right">
+          <div className="btn-group-responsive">
+            {!isNew && <button className="btn btn-responsive" onClick={onDelete}>Delete</button>}
+            <button className="btn primary btn-responsive" onClick={handleSave} disabled={saving}>
+              {saving ? "Saving…" : (isNew ? "Create journal" : "Save changes")}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

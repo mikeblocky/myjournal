@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import * as api from "../features/notes/notes.api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { today } from "../lib/date";
+import "../styles/ai.css";
+import "../styles/responsive.css";
 
 export default function NotesPage(){
   const { token } = useAuth();
@@ -106,100 +108,78 @@ export default function NotesPage(){
   }
 
   return (
-    <div className="fade-in" style={{ display:"grid", gap:16 }}>
-      <div className="j-toolbar">
-        <div className="kicker">Notes</div>
-        <div className="date-selector">
-          <label className="ui-mono" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            Date:
+    <div className="fade-in page container">
+      <div className="j-toolbar toolbar-responsive">
+        <div className="toolbar-left">
+          <div className="kicker">Notes for {date}</div>
+        </div>
+        <div className="toolbar-right">
+          <div className="search-responsive">
             <input 
               type="date" 
               value={date} 
               onChange={e=>setDate(e.target.value)}
-              style={{ width: "auto", padding: "8px 12px" }}
+              className="input-responsive"
             />
-          </label>
+            <button className="btn btn-responsive" onClick={loadNotes}>Reload</button>
+          </div>
         </div>
-        
-        <div className="spacer" />
-        <button className="btn" onClick={loadNotes}>Reload</button>
       </div>
 
-      {/* AI daily summary */}
-      <section className="ai-summary-section">
-        <div className="ai-summary-header">
-          <div className="ai-summary-title">
-            <span className="ai-chip">Daily AI Notes</span>
-            <span className="ai-date">{date}</span>
+      {/* AI daily summary with unified design */}
+      <section className="ai-component ai-responsive">
+        <div className="ai-header">
+          <div className="ai-title">
+            <span className="ai-icon">📝</span>
+            <h3 className="ai-label">Daily AI Notes</h3>
+            <div className="ai-mode-indicator">{date}</div>
           </div>
-          <div className="ai-summary-controls">
+          <div className="ai-controls">
             <button 
-              className="btn primary" 
+              className="ai-generate-btn" 
               onClick={handleGenerateDaily} 
               disabled={daily.loading}
             >
-              {daily.loading ? "Summarizing…" : "Generate summary"}
+              {daily.loading ? "Summarizing…" : "Generate Summary"}
             </button>
           </div>
         </div>
 
-        <div className="ai-summary-content">
+        <div className="ai-content">
           {daily.err && (
-            <div className="ai-error-card">
-              <div className="error-header">
-                <span className="error-icon">Error</span>
-                <span className="error-title">Error</span>
-              </div>
-              <div className="error-content">{daily.err}</div>
+            <div className="ai-error">
+              <p>Error: {daily.err}</p>
             </div>
           )}
 
           {!daily.loading && daily.nothingToDo && (list.length === 0) && (
-            <div className="ai-empty-card">
-              <div className="empty-header">
-                <span className="empty-icon">Empty</span>
-                <span className="empty-title">Nothing to do today</span>
-              </div>
-              <div className="empty-content">You have no notes for today.</div>
+            <div className="ai-prompt">
+              <div className="ai-prompt-content">You have no notes for today.</div>
             </div>
           )}
 
           {!daily.loading && !daily.nothingToDo && daily.item?.bullets?.length > 0 && (
             <div className="ai-summary-card">
-              <div className="summary-header">
-                <span className="summary-icon"></span>
-                <span className="summary-title">Generated summary</span>
-              </div>
-              <div className="summary-content">
-                <ul className="summary-bullets">
-                  {daily.item.bullets.map((b,i)=>(
-                    <li key={i} className="summary-bullet">
-                      <span className="bullet-marker">•</span>
-                      <span className="bullet-text">{b}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="ai-summary-title">Generated Summary</div>
+              <div className="ai-summary-text">
+                {daily.item.bullets.map((b,i)=>(
+                  <div key={i} style={{ marginBottom: '8px' }}>
+                    • {b}
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {!daily.loading && !daily.item && list.length > 0 && (
-            <div className="ai-prompt-card">
-              <div className="prompt-header">
-                <span className="prompt-icon">Ready</span>
-                <span className="prompt-title">Ready to summarize</span>
-              </div>
-              <div className="prompt-content">Click "Generate Summary" to create an AI-powered summary of your notes.</div>
+            <div className="ai-prompt">
+              <div className="ai-prompt-content">Click "Generate Summary" to create an AI-powered summary of your notes.</div>
             </div>
           )}
 
           {daily.loading && (
-            <div className="ai-loading-card">
-              <div className="loading-header">
-                <div className="loading-spinner"></div>
-                <span className="loading-title">Generating Summary</span>
-              </div>
-              <div className="loading-content">Analyzing your notes and generating insights...</div>
+            <div className="ai-loading">
+              <LoadingSpinner text="Analyzing your notes and generating insights..." variant="compact" />
             </div>
           )}
         </div>

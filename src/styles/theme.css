@@ -1,3 +1,6 @@
+/* Import responsive design system */
+@import "./responsive.css";
+
 /* Geist Mono (UI/titles/buttons) */
 @font-face{
   font-family:"Geist Mono";
