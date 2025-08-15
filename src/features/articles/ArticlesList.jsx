@@ -197,12 +197,12 @@ export default function ArticlesList(){
         </section>
       )}
 
-      {/* responsive pager */}
-      <div className="pagination-responsive">
-        <button className="btn btn-responsive" disabled={page<=1} onClick={()=>load(page-1)}>Prev</button>
-        <span className="kicker">Page {page}</span>
-        <button className="btn btn-responsive" disabled={filtered.length < limit} onClick={()=>load(page+1)}>Next</button>
-      </div>
+             {/* responsive pager */}
+       <div className="pagination-responsive">
+         <button className="btn btn-responsive" disabled={page<=1} onClick={()=>load(page-1)}>Prev</button>
+         <span className="kicker">Page {page}</span>
+         <button className="btn btn-responsive" disabled={items.length < limit} onClick={()=>load(page+1)}>Next</button>
+       </div>
     </div>
   );
 }

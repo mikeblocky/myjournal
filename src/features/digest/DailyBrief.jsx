@@ -16,7 +16,7 @@ export default function DailyBrief() {
     const { token } = useAuth();
     const [length, setLength] = useState("detailed"); // "tldr" | "detailed"
     
-    // Use optimized fetching hook
+    // Use optimized fetching hook with background loading
     const { 
         data: digestData, 
         loading, 
@@ -27,7 +27,7 @@ export default function DailyBrief() {
         digestLength: length,
         immediate: !!token,
         enableBackgroundRefresh: true,
-        backgroundRefreshInterval: 60000, // 1 minute
+        backgroundRefreshInterval: 30000, // 30 seconds for faster updates
         staleTime: 300000 // 5 minutes
     });
 
@@ -97,45 +97,52 @@ export default function DailyBrief() {
         <div className="fade-in page">
             <h2 className="ui-mono" style={{ marginTop: 0 }}>Daily brief — {todayUTC()}</h2>
 
-            <div className="j-toolbar" style={{ marginBottom: 12 }}>
-                <div className="kicker">Controls</div>
-                <label className="ui-mono" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                    Length:
-                    <select value={length} onChange={e => setLength(e.target.value)} className="ui-mono">
-                        <option value="detailed">Detailed</option>
-                        <option value="tldr">Short TL;DR</option>
-                    </select>
-                </label>
-                
-                {/* Performance indicators */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {isStale && (
-                        <span className="kicker" style={{ 
-                            color: "#f59e0b", 
-                            padding: "4px 8px", 
-                            background: "#fef3c7", 
-                            borderRadius: "var(--radius-1)",
-                            border: "1px solid #fbbf24"
-                        }}>
-                            Stale data
-                        </span>
-                    )}
-                    {state.digest && (
-                        <span className="kicker" style={{ 
-                            color: "#10b981", 
-                            padding: "4px 8px", 
-                            background: "#d1fae5", 
-                            borderRadius: "var(--radius-1)",
-                            border: "1px solid #34d399"
-                        }}>
-                            Fresh
-                        </span>
-                    )}
+            <div className="j-toolbar toolbar-responsive" style={{ marginBottom: 12 }}>
+                <div className="toolbar-left">
+                    <div className="kicker">Controls</div>
+                    <div className="search-responsive">
+                        <label className="ui-mono" style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                            Length:
+                            <select value={length} onChange={e => setLength(e.target.value)} className="ui-mono input-responsive">
+                                <option value="detailed">Detailed</option>
+                                <option value="tldr">Short TL;DR</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 
-                <div className="spacer" />
-                <button className="ai-generate-btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
-                <button className="ai-generate-btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
+                <div className="toolbar-right">
+                    {/* Performance indicators */}
+                    <div className="flex-responsive-sm">
+                        {isStale && (
+                            <span className="kicker" style={{ 
+                                color: "#f59e0b", 
+                                padding: "4px 8px", 
+                                background: "#fef3c7", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #fbbf24"
+                            }}>
+                                Stale data
+                            </span>
+                        )}
+                        {state.digest && (
+                            <span className="kicker" style={{ 
+                                color: "#10b981", 
+                                padding: "4px 8px", 
+                                background: "#d1fae5", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #34d399"
+                            }}>
+                                Fresh
+                            </span>
+                        )}
+                    </div>
+                    
+                    <div className="btn-group-responsive">
+                        <button className="ai-generate-btn" onClick={() => handleGenerate({ refresh: false })}>Regenerate</button>
+                        <button className="ai-generate-btn" onClick={handleRefreshAndGenerate}>Refresh news + regenerate</button>
+                    </div>
+                </div>
             </div>
 
             {!d && (
@@ -185,10 +192,36 @@ export default function DailyBrief() {
                         </div>
                     </section>
 
-
+                    {/* News Sections */}
+                    <Section title="Top stories" items={(d.items || []).filter(i => i.category === "top")} />
+                    <Section title="Emerging" items={(d.items || []).filter(i => i.category === "emerging")} />
+                    <Section title="Long reads" items={(d.items || []).filter(i => i.category === "long")} />
                 </>
             )}
         </div>
+    );
+}
+
+function Section({ title, items }) {
+    if (!items?.length) return null;
+    return (
+        <section className="card" style={{ padding: 16, marginBottom: 16 }}>
+            <h3 className="ui-mono" style={{ margin: "0 0 8px 0" }}>{title}</h3>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
+                {items.map((it, idx) => (
+                    <li key={idx} className="panel" style={{ padding: 12 }}>
+                        <div className="kicker">{it.source || hostFromUrl(it.url)} · ~{it.readingMins} min</div>
+                        <h4 className="ui-mono" style={{ margin: "6px 0 8px 0" }}>{it.title}</h4>
+                        {it.summary && <p className="prose" style={{ margin: "0 0 8px 0" }}>{it.summary}</p>}
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            {it.articleId
+                                ? <Link className="btn" to={`/articles/${it.articleId}`}>Open saved copy</Link>
+                                : <a className="btn" href={it.url} target="_blank" rel="noreferrer">Open original</a>}
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </section>
     );
 }
 

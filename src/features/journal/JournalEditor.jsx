@@ -144,8 +144,8 @@ export default function JournalEditor({ entry, onSave, onDelete, saving=false })
   }
 
   return (
-    <div className="panel form-responsive-single" style={{ padding: 16 }}>
-      <div className="form-responsive">
+    <div className="panel" style={{ padding: 24, maxWidth: "none", width: "100%" }}>
+      <div className="form-responsive" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
         <div style={{ display: "grid", gap: 6 }}>
           <label>Title</label>
           <input
@@ -216,21 +216,23 @@ export default function JournalEditor({ entry, onSave, onDelete, saving=false })
         </div>
       )}
 
-      <div style={{ display: "grid", gap: 6 }}>
-        <label>{mode === "outline" ? "Outline" : "Body"}</label>
-        {mode === "outline" ? (
-          <div style={{ position: "relative" }}>
-            <textarea
-              className="editor-body outline-mode"
-              placeholder="• Start with a bullet point&#10;• Add more points as needed&#10;• Use AI to generate from your text"
-              value={body}
-              onChange={e=>setBody(e.target.value)}
-              rows={16}
-              style={{
-                paddingLeft: "1.2em"
-              }}
-              onKeyDown={handleKeyDown}
-            />
+             <div style={{ display: "grid", gap: 6 }}>
+         <label>{mode === "outline" ? "Outline" : "Body"}</label>
+         {mode === "outline" ? (
+           <div style={{ position: "relative" }}>
+             <textarea
+               className="editor-body outline-mode"
+               placeholder="• Start with a bullet point&#10;• Add more points as needed&#10;• Use AI to generate from your text"
+               value={body}
+               onChange={e=>setBody(e.target.value)}
+               rows={16}
+               style={{
+                 paddingLeft: "1.2em",
+                 width: "100%",
+                 minHeight: "400px"
+               }}
+               onKeyDown={handleKeyDown}
+             />
             {/* Bullet indicators */}
             <div style={{
               position: "absolute",
@@ -246,15 +248,19 @@ export default function JournalEditor({ entry, onSave, onDelete, saving=false })
               ))}
             </div>
           </div>
-        ) : (
-          <textarea
-            className="editor-body"
-            placeholder="Write your long-form thoughts here…"
-            value={body}
-            onChange={e=>setBody(e.target.value)}
-            rows={16}
-          />
-        )}
+                 ) : (
+           <textarea
+             className="editor-body"
+             placeholder="Write your long-form thoughts here…"
+             value={body}
+             onChange={e=>setBody(e.target.value)}
+             rows={16}
+             style={{
+               width: "100%",
+               minHeight: "400px"
+             }}
+           />
+         )}
       </div>
 
       <div className="toolbar-responsive">
