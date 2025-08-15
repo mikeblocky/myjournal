@@ -37,3 +37,216 @@
 /* chips */
 .chip{ border:1px solid var(--border); background: var(--panel); padding:2px 8px; border-radius:999px; font-size:12px; }
 .chip-active{ border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+
+/* AI Summary Section Styles */
+.ai-summary-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-1);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.ai-summary-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.ai-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.ai-summary-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-summary-title .ai-chip {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ai-mode-indicator {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 2px 6px;
+  background: var(--panel-light);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+}
+
+.ai-summary-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ai-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-error-card, .ai-prompt-card, .ai-loading-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-1);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.ai-error-card:hover, .ai-prompt-card:hover, .ai-loading-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.ai-error-card .error-header, .ai-prompt-card .prompt-header, .ai-loading-card .loading-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-error-card .error-icon, .ai-prompt-card .prompt-icon, .ai-loading-card .loading-spinner {
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.ai-error-card .error-title, .ai-prompt-card .prompt-title, .ai-loading-card .loading-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.ai-error-card .error-content, .ai-prompt-card .prompt-content, .ai-loading-card .loading-content {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.ai-summary-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-1);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.ai-summary-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-header .summary-icon {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.summary-header .summary-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.summary-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.summary-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.summary-bullet .bullet-marker {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.summary-bullet .bullet-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.ai-loading-card .loading-spinner {
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .ai-summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ai-summary-controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mode-buttons {
+    gap: 4px;
+  }
+}
