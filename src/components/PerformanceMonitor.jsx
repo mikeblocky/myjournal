@@ -75,26 +75,7 @@ export default function PerformanceMonitor() {
   }, []);
 
   if (!isVisible) {
-    return (
-      <button
-        onClick={() => setIsVisible(true)}
-        className="btn primary"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          width: '40px',
-          height: '40px',
-          borderRadius: 'var(--radius-round)',
-          fontSize: '12px',
-          fontWeight: '600',
-          zIndex: 1000
-        }}
-        title="Show Performance Monitor"
-      >
-        PM
-      </button>
-    );
+    return null; // Don't show the PM button
   }
 
   return (
