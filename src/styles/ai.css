@@ -331,3 +331,39 @@ html[data-theme="dark"] .ai-summary-card {
   background: var(--panel);
   border-color: var(--border);
 }
+
+/* Calendar AI Specific Enhancements */
+.ai-responsive {
+  margin-bottom: var(--space-4);
+}
+
+.ai-responsive .ai-header {
+  background: linear-gradient(135deg, var(--panel), color-mix(in oklab, var(--panel) 95%, var(--accent) 5%));
+}
+
+.ai-responsive .ai-icon {
+  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--text) 20%));
+  color: white;
+}
+
+.ai-responsive .ai-mode-indicator {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.ai-responsive .ai-summary-card {
+  background: linear-gradient(135deg, var(--panel), color-mix(in oklab, var(--panel) 98%, var(--accent) 2%));
+  border-color: color-mix(in oklab, var(--border) 80%, var(--accent) 20%);
+}
+
+.ai-responsive .ai-summary-title {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.ai-responsive .ai-summary-title::before {
+  content: '📋';
+  color: var(--accent);
+}

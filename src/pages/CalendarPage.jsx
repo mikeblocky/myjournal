@@ -4,6 +4,7 @@ import * as api from "../features/calendar/calendar.api";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { ymd, firstOfMonthDate, addDays } from "../lib/date";
 import "../styles/calendar.css";
+import "../styles/ai.css";
 
 function startOfGrid(monthDate){
   // Ensure monthDate is a valid Date object
@@ -349,26 +350,60 @@ export default function CalendarPage(){
       </div>
 
       {/* AI Day Plan */}
-      <section className="ai-day-plan">
-        <div className="ai-day-plan-header">
-          <span className="ai-chip">Day Plan</span>
-          <span className="date">{selected}</span>
-          <div className="spacer" />
-          <button className="btn" onClick={onGeneratePlan} disabled={plan.loading}>
-            {plan.loading ? "Planning…" : "Generate plan"}
-          </button>
+      <section className="ai-component ai-responsive">
+        <div className="ai-header">
+          <div className="ai-title">
+            <span className="ai-icon">📅</span>
+            <h3 className="ai-label">AI Day Plan</h3>
+            <div className="ai-mode-indicator">
+              {selected}
+            </div>
+          </div>
+          <div className="ai-controls">
+            <button 
+              className="ai-generate-btn" 
+              onClick={onGeneratePlan} 
+              disabled={plan.loading}
+            >
+              {plan.loading ? "Planning…" : "✨ Generate Plan"}
+            </button>
+          </div>
         </div>
-        {plan.err && <p className="prose" style={{ color:"crimson" }}>{plan.err}</p>}
-        {!plan.loading && plan.nothingToDo && (
-          <p className="prose" style={{ margin:0, opacity:0.9 }}>Nothing scheduled today.</p>
-        )}
-        {!plan.loading && !plan.nothingToDo && plan.item?.agenda?.length > 0 && (
-          <ul className="prose">
-            {plan.item.agenda.map((b,i)=>(
-              <li key={i}>{fixTruncatedTime(b)}</li>
-            ))}
-          </ul>
-        )}
+        
+        <div className="ai-content">
+          {plan.err && (
+            <div className="ai-error">
+              <p style={{ margin: 0 }}>{plan.err}</p>
+            </div>
+          )}
+          
+          {!plan.loading && plan.nothingToDo && (
+            <div className="ai-prompt">
+              <div className="ai-prompt-content">
+                Nothing scheduled today. Generate an AI-powered plan to make the most of your day!
+              </div>
+            </div>
+          )}
+          
+          {!plan.loading && !plan.nothingToDo && plan.item?.agenda?.length > 0 && (
+            <div className="ai-summary-card">
+              <div className="ai-summary-title">Today's Agenda</div>
+              <div className="ai-summary-text">
+                {plan.item.agenda.map((b,i)=>(
+                  <div key={i} style={{ marginBottom: '8px' }}>
+                    • {fixTruncatedTime(b)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {plan.loading && (
+            <div className="ai-loading">
+              <LoadingSpinner text="AI is planning your day..." variant="compact" />
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Calendar Views */}

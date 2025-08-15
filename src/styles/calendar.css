@@ -262,40 +262,7 @@
   font-size: 0.9rem;
 }
 
-/* AI Day Plan Section */
-.ai-day-plan {
-  padding: var(--space-4);
-  border-radius: var(--radius-2);
-  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 80%, var(--text) 20%));
-  color: white;
-}
-
-.ai-day-plan-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-2);
-}
-
-.ai-day-plan .date {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.ai-day-plan .spacer {
-  flex: 1;
-}
-
-.ai-day-plan ul {
-  margin: 0;
-  padding-left: 1.2em;
-}
-
-.ai-day-plan li {
-  margin-bottom: var(--space-1);
-}
+/* AI Day Plan Section - Now uses unified AI design system */
 
 /* Event Modal */
 .event-modal {
@@ -403,19 +370,7 @@
     font-size: 9px;
   }
   
-  .ai-day-plan {
-    padding: var(--space-3);
-  }
-  
-  .ai-day-plan-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-2);
-  }
-  
-  .ai-day-plan .spacer {
-    display: none;
-  }
+  /* AI day plan now uses unified responsive design */
   
   .event-modal {
     padding: var(--space-2);
@@ -638,7 +593,7 @@
 /* Print styles */
 @media print {
   .calendar-toolbar,
-  .ai-day-plan,
+  /* AI day plan now uses unified design */
   .event-modal {
     display: none;
   }
