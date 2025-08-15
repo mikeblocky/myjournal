@@ -6,6 +6,12 @@ import { ymd, firstOfMonthDate, addDays } from "../lib/date";
 import "../styles/calendar.css";
 
 function startOfGrid(monthDate){
+  // Ensure monthDate is a valid Date object
+  if (!(monthDate instanceof Date) || isNaN(monthDate.getTime())) {
+    console.error('Invalid monthDate in startOfGrid:', monthDate);
+    return new Date(); // Return today as fallback
+  }
+  
   const first = firstOfMonthDate(monthDate);
   const dow = first.getDay(); // 0=Sun
   // Use our date utility to avoid timezone issues
@@ -15,6 +21,12 @@ function startOfGrid(monthDate){
 }
 function endOfGrid(monthDate){
   const start = startOfGrid(monthDate);
+  // Ensure start is a valid Date object
+  if (!(start instanceof Date) || isNaN(start.getTime())) {
+    console.error('Invalid start date in endOfGrid:', start);
+    return new Date(); // Return today as fallback
+  }
+  
   const endDate = new Date(start);
   endDate.setDate(endDate.getDate() + 6*7 - 1); // 6 weeks grid
   return endDate;
@@ -23,7 +35,15 @@ function sameDay(a,b){ return ymd(a) === ymd(b); }
 
 export default function CalendarPage(){
   const { token } = useAuth();
-  const [monthDate, setMonthDate] = useState(firstOfMonthDate(new Date()));
+  
+  // Ensure monthDate is properly initialized as a Date object
+  const [monthDate, setMonthDate] = useState(() => {
+    const today = new Date();
+    const firstOfMonth = firstOfMonthDate(today);
+    console.log('Initializing monthDate:', { today, firstOfMonth });
+    return firstOfMonth;
+  });
+  
   const [selected, setSelected] = useState(ymd(new Date()));
   const [viewMode, setViewMode] = useState("month"); // "month", "week", or "list"
   const [isMobile, setIsMobile] = useState(false);
@@ -36,18 +56,7 @@ export default function CalendarPage(){
   // AI plan
   const [plan, setPlan] = useState({ loading: true, item: null, nothingToDo: false, err: "" });
 
-  // Debug: Log the selected date to see what's happening
-  useEffect(() => {
-    console.log('Calendar Debug:', {
-      selected,
-      selectedDate: new Date(selected),
-      selectedDateString: new Date(selected).toISOString(),
-      selectedDateLocal: new Date(selected).toLocaleDateString(),
-      today: ymd(new Date()),
-      todayDate: new Date(),
-      todayISO: new Date().toISOString()
-    });
-  }, [selected]);
+
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -63,33 +72,54 @@ export default function CalendarPage(){
   const gridStart = useMemo(()=> startOfGrid(monthDate), [monthDate]);
   const gridEnd   = useMemo(()=> endOfGrid(monthDate),   [monthDate]);
 
-  // Debug: Log grid calculation
+  // Temporary debugging to identify the issue
   useEffect(() => {
-    console.log('Grid Debug:', {
+    console.log('Debug dates:', {
       monthDate,
+      monthDateType: typeof monthDate,
+      monthDateIsDate: monthDate instanceof Date,
+      monthDateValid: monthDate instanceof Date ? !isNaN(monthDate.getTime()) : false,
       gridStart,
-      gridEnd,
-      gridStartYmd: ymd(gridStart),
-      gridEndYmd: ymd(gridEnd),
+      gridStartType: typeof gridStart,
+      gridStartIsDate: gridStart instanceof Date,
+      gridStartValid: gridStart instanceof Date ? !isNaN(gridStart.getTime()) : false,
       selected,
-      monthDateString: monthDate.toISOString()
+      selectedType: typeof selected
     });
-  }, [monthDate, gridStart, gridEnd, selected]);
+  }, [monthDate, gridStart, selected]);
 
   const days = useMemo(()=>{
     const arr = [];
-    for (let i=0;i<42;i++) arr.push(addDays(gridStart, i));
+    // Ensure gridStart is a valid Date object
+    if (!(gridStart instanceof Date) || isNaN(gridStart.getTime())) {
+      console.error('Invalid gridStart:', gridStart);
+      return [];
+    }
+    
+    for (let i=0;i<42;i++) {
+      const date = new Date(gridStart);
+      date.setDate(date.getDate() + i);
+      arr.push(date);
+    }
     return arr;
   }, [gridStart]);
 
   // Get week view days (7 days starting from selected date)
   const weekDays = useMemo(() => {
     const start = new Date(selected);
+    if (isNaN(start.getTime())) {
+      console.error('Invalid selected date:', selected);
+      return [];
+    }
+    
     const dayOfWeek = start.getDay();
-    const weekStart = addDays(start, -dayOfWeek);
+    const weekStart = new Date(start);
+    weekStart.setDate(weekStart.getDate() - dayOfWeek);
     const arr = [];
     for (let i = 0; i < 7; i++) {
-      arr.push(addDays(weekStart, i));
+      const date = new Date(weekStart);
+      date.setDate(date.getDate() + i);
+      arr.push(date);
     }
     return arr;
   }, [selected]);
@@ -97,7 +127,8 @@ export default function CalendarPage(){
   // Get list view events (events for the next 7 days)
   const listViewEvents = useMemo(() => {
     const today = new Date();
-    const nextWeek = addDays(today, 7);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
     const eventsInRange = events.filter(ev => {
       const eventDate = new Date(ev.date);
       return eventDate >= today && eventDate <= nextWeek;
@@ -162,9 +193,31 @@ export default function CalendarPage(){
   // modal state
   const [modal, setModal] = useState({ open:false, data:null });
 
-  function prevMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()-1); setMonthDate(firstOfMonthDate(d)); }
-  function nextMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()+1); setMonthDate(firstOfMonthDate(d)); }
-  function today(){ const t = firstOfMonthDate(new Date()); setMonthDate(t); setSelected(ymd(new Date())); }
+  function prevMonth(){ 
+    const d = new Date(monthDate); 
+    if (isNaN(d.getTime())) {
+      console.error('Invalid monthDate in prevMonth:', monthDate);
+      return;
+    }
+    d.setMonth(d.getMonth()-1); 
+    setMonthDate(firstOfMonthDate(d)); 
+  }
+  
+  function nextMonth(){ 
+    const d = new Date(monthDate); 
+    if (isNaN(d.getTime())) {
+      console.error('Invalid monthDate in nextMonth:', monthDate);
+      return;
+    }
+    d.setMonth(d.getMonth()+1); 
+    setMonthDate(firstOfMonthDate(d)); 
+  }
+  
+  function today(){ 
+    const t = firstOfMonthDate(new Date()); 
+    setMonthDate(t); 
+    setSelected(ymd(new Date())); 
+  }
 
   function prevWeek(){ 
     const d = new Date(selected); 
@@ -313,6 +366,12 @@ export default function CalendarPage(){
                   ))}
                 </div>
                 {(viewMode === "month" ? days : weekDays).map((d,i)=>{
+                  // Ensure d is a valid Date object
+                  if (!(d instanceof Date) || isNaN(d.getTime())) {
+                    console.warn('Invalid date object:', d);
+                    return null;
+                  }
+                  
                   const isOtherMonth = viewMode === "month" && d.getMonth() !== monthDate.getMonth();
                   const key = ymd(d);
                   const list = byDate.get(key) || [];
@@ -333,11 +392,18 @@ export default function CalendarPage(){
                         {list.slice(0, viewMode === "week" ? 5 : 3).map(ev=>(
                           <button
                             key={ev.id}
-                            className="calendar-event"
+                            className={`calendar-event ${ev.allDay ? 'all-day' : 'timed'}`}
                             onClick={(e)=>{ e.stopPropagation(); setModal({ open:true, data: ev }); }}
                             title="Click to edit"
                           >
-                            {ev.allDay ? "All-day" : ev.startTime} · {ev.title}
+                            <div className="event-content">
+                              <div className="event-time-badge">
+                                {ev.allDay ? "All-day" : ev.startTime}
+                              </div>
+                              <div className="event-title-text">
+                                {ev.title}
+                              </div>
+                            </div>
                           </button>
                         ))}
                         {list.length > (viewMode === "week" ? 5 : 3) && (
@@ -346,7 +412,7 @@ export default function CalendarPage(){
                       </div>
                     </div>
                   );
-                })}
+                }).filter(Boolean)}
               </div>
             )}
 
@@ -371,7 +437,7 @@ export default function CalendarPage(){
                         {events.map(ev => (
                           <button
                             key={ev.id}
-                            className="calendar-list-event"
+                            className={`calendar-list-event ${ev.allDay ? 'all-day' : 'timed'}`}
                             onClick={() => setModal({ open: true, data: ev })}
                             title="Click to edit"
                           >
