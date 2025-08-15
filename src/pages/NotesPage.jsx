@@ -107,162 +107,860 @@ export default function NotesPage(){
 
   return (
     <div className="fade-in" style={{ display:"grid", gap:16 }}>
-      <div className="panel" style={{ padding:12, display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
-        <div className="kicker">Notes</div>
-        <label className="ui-mono" style={{ display:"flex", alignItems:"center", gap:8 }}>
-          Date:
-          <input type="date" value={date} onChange={e=>setDate(e.target.value)} />
-        </label>
-        <div style={{ flex:1 }} />
-        <button className="btn" onClick={loadNotes}>Reload</button>
+      <div className="toolbar-card">
+        <div className="toolbar-content">
+          <div className="toolbar-left">
+            <span className="toolbar-icon">📝</span>
+            <span className="toolbar-title">Notes</span>
+            <div className="date-selector">
+              <label className="date-label">
+                <span className="date-text">Date:</span>
+                <input 
+                  type="date" 
+                  value={date} 
+                  onChange={e=>setDate(e.target.value)}
+                  className="date-input"
+                />
+              </label>
+            </div>
+          </div>
+          
+          <div className="toolbar-right">
+            <button className="btn secondary" onClick={loadNotes}>
+              <span className="btn-icon">🔄</span>
+              <span className="btn-text">Reload</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* AI daily summary */}
-      <section className="ai-card" style={{ padding:16 }}>
-        <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", marginBottom:8 }}>
-          <span className="ai-chip">✨ Daily AI Notes</span>
-          <span className="kicker">{date}</span>
-          <div style={{ flex:1 }} />
-          <button className="btn" onClick={handleGenerateDaily} disabled={daily.loading}>
-            {daily.loading ? "Summarizing…" : "Summarize today"}
-          </button>
+      <section className="ai-summary-card">
+        <div className="ai-summary-header">
+          <div className="ai-summary-title">
+            <span className="ai-chip">✨ Daily AI Notes</span>
+            <span className="ai-date">{date}</span>
+          </div>
+          <div className="ai-summary-controls">
+            <button 
+              className="btn primary" 
+              onClick={handleGenerateDaily} 
+              disabled={daily.loading}
+            >
+              {daily.loading ? "Summarizing…" : "Generate Summary"}
+            </button>
+          </div>
         </div>
 
-        {daily.err && <p className="prose" style={{ color:"crimson" }}>{daily.err}</p>}
+        <div className="ai-summary-content">
+          {daily.err && (
+            <div className="ai-error">
+              <span className="error-icon">⚠️</span>
+              <span className="error-text">{daily.err}</span>
+            </div>
+          )}
 
-        {!daily.loading && daily.nothingToDo && (list.length === 0) && (
-          <p className="prose" style={{ margin:0, color:"var(--muted)" }}>✨ Nothing to do today.</p>
-        )}
+          {!daily.loading && daily.nothingToDo && (list.length === 0) && (
+            <div className="ai-empty-state">
+              <span className="empty-icon">✨</span>
+              <span className="empty-text">Nothing to do today.</span>
+            </div>
+          )}
 
-        {!daily.loading && !daily.nothingToDo && daily.item?.bullets?.length > 0 && (
-          <ul className="prose" style={{ margin:0, paddingLeft:"1.2em" }}>
-            {daily.item.bullets.map((b,i)=><li key={i}>{b}</li>)}
-          </ul>
-        )}
+          {!daily.loading && !daily.nothingToDo && daily.item?.bullets?.length > 0 && (
+            <div className="ai-summary-list">
+              <div className="summary-header">
+                <span className="summary-icon">📋</span>
+                <span className="summary-title">AI Generated Summary</span>
+              </div>
+              <ul className="summary-bullets">
+                {daily.item.bullets.map((b,i)=>(
+                  <li key={i} className="summary-bullet">
+                    <span className="bullet-marker">•</span>
+                    <span className="bullet-text">{b}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        {!daily.loading && !daily.item && list.length > 0 && (
-          <p className="prose" style={{ margin:0, color:"var(--muted)" }}>No summary yet. Click "Summarize today".</p>
-        )}
+          {!daily.loading && !daily.item && list.length > 0 && (
+            <div className="ai-prompt">
+              <span className="prompt-icon">💡</span>
+              <span className="prompt-text">No summary yet. Click "Generate Summary" to create an AI-powered summary of your notes.</span>
+            </div>
+          )}
+
+          {daily.loading && (
+            <div className="ai-loading">
+              <div className="loading-spinner"></div>
+              <span className="loading-text">Analyzing your notes and generating insights...</span>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Calendar Sync Options */}
       {list.length > 0 && (
-        <section className="card" style={{ padding:16 }}>
-          <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", marginBottom:12 }}>
-            <span className="kicker">📅 Calendar Sync</span>
-            <div style={{ flex:1 }} />
-            <button 
-              className="btn primary" 
-              onClick={syncAllNotesToCalendar} 
-              disabled={syncing}
-            >
-              {syncing ? "Syncing..." : `Sync ${list.length} notes to calendar`}
-            </button>
+        <section className="sync-options-card">
+          <div className="sync-options-header">
+            <div className="sync-options-title">
+              <span className="sync-icon">📅</span>
+              <span className="sync-title">Calendar Sync</span>
+            </div>
+            <div className="sync-options-controls">
+              <button 
+                className="btn primary" 
+                onClick={syncAllNotesToCalendar} 
+                disabled={syncing}
+              >
+                {syncing ? "Syncing..." : `Sync ${list.length} notes to calendar`}
+              </button>
+            </div>
           </div>
           
-          <div style={{ display:"grid", gap:8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-            <label>
-              Start Time:
-              <input 
-                type="time" 
-                value={syncOptions.startTime} 
-                onChange={e => setSyncOptions(opt => ({ ...opt, startTime: e.target.value }))}
-                disabled={syncOptions.allDay}
-              />
-            </label>
+          <div className="sync-options-grid">
+            <div className="sync-option-group">
+              <label className="sync-label">
+                <span className="label-text">Start Time</span>
+                <input 
+                  type="time" 
+                  value={syncOptions.startTime} 
+                  onChange={e => setSyncOptions(opt => ({ ...opt, startTime: e.target.value }))}
+                  disabled={syncOptions.allDay}
+                  className="sync-input"
+                />
+              </label>
+            </div>
             
-            <label>
-              End Time:
-              <input 
-                type="time" 
-                value={syncOptions.endTime} 
-                onChange={e => setSyncOptions(opt => ({ ...opt, endTime: e.target.value }))}
-                disabled={syncOptions.allDay}
-              />
-            </label>
+            <div className="sync-option-group">
+              <label className="sync-label">
+                <span className="label-text">End Time</span>
+                <input 
+                  type="time" 
+                  value={syncOptions.endTime} 
+                  onChange={e => setSyncOptions(opt => ({ ...opt, endTime: e.target.value }))}
+                  disabled={syncOptions.allDay}
+                  className="sync-input"
+                />
+              </label>
+            </div>
             
-            <label style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <input 
-                type="checkbox" 
-                checked={syncOptions.allDay} 
-                onChange={e => setSyncOptions(opt => ({ ...opt, allDay: e.target.checked }))}
-              />
-              All Day Event
-            </label>
+            <div className="sync-option-group">
+              <label className="sync-checkbox-label">
+                <input 
+                  type="checkbox" 
+                  checked={syncOptions.allDay} 
+                  onChange={e => setSyncOptions(opt => ({ ...opt, allDay: e.target.checked }))}
+                  className="sync-checkbox"
+                />
+                <span className="checkbox-text">All Day Event</span>
+              </label>
+            </div>
             
-            <label>
-              Location:
-              <input 
-                type="text" 
-                placeholder="Optional location"
-                value={syncOptions.location} 
-                onChange={e => setSyncOptions(opt => ({ ...opt, location: e.target.value }))}
-              />
-            </label>
+            <div className="sync-option-group">
+              <label className="sync-label">
+                <span className="label-text">Location</span>
+                <input 
+                  type="text" 
+                  placeholder="Optional location"
+                  value={syncOptions.location} 
+                  onChange={e => setSyncOptions(opt => ({ ...opt, location: e.target.value }))}
+                  className="sync-input"
+                />
+              </label>
+            </div>
             
-            <label>
-              Color:
-              <input 
-                type="color" 
-                value={syncOptions.color} 
-                onChange={e => setSyncOptions(opt => ({ ...opt, color: e.target.value }))}
-              />
-            </label>
+            <div className="sync-option-group">
+              <label className="sync-label">
+                <span className="label-text">Color</span>
+                <input 
+                  type="color" 
+                  value={syncOptions.color} 
+                  onChange={e => setSyncOptions(opt => ({ ...opt, color: e.target.value }))}
+                  className="sync-color-input"
+                />
+              </label>
+            </div>
           </div>
         </section>
       )}
 
       {/* Add note */}
-      <form onSubmit={onCreate} className="card" style={{ padding:16, display:"grid", gap:8 }}>
-        <label>Title</label>
-        <input
-          placeholder="Quick note title"
-          value={form.title}
-          onChange={e=>setForm(f=>({ ...f, title: e.target.value }))}
-        />
-        <label>Details</label>
-        <textarea
-          className="editor-body"
-          placeholder="Write a few lines…"
-          rows={5}
-          value={form.body}
-          onChange={e=>setForm(f=>({ ...f, body: e.target.value }))}
-        />
-        <div style={{ display:"flex", gap:8 }}>
-          <button className="btn primary" disabled={saving}>{saving ? "Saving…" : "Add note"}</button>
+      <form onSubmit={onCreate} className="add-note-card">
+        <div className="add-note-header">
+          <span className="add-note-icon">✏️</span>
+          <span className="add-note-title">Add New Note</span>
+        </div>
+        
+        <div className="add-note-form">
+          <div className="form-group">
+            <label className="form-label">Title</label>
+            <input
+              placeholder="Quick note title"
+              value={form.title}
+              onChange={e=>setForm(f=>({ ...f, title: e.target.value }))}
+              className="form-input"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label className="form-label">Details</label>
+            <textarea
+              className="form-textarea"
+              placeholder="Write a few lines…"
+              rows={5}
+              value={form.body}
+              onChange={e=>setForm(f=>({ ...f, body: e.target.value }))}
+            />
+          </div>
+          
+          <div className="form-actions">
+            <button className="btn primary" disabled={saving}>
+              {saving ? "Saving…" : "Add Note"}
+            </button>
+          </div>
         </div>
       </form>
 
-      {/* List notes */}
+      {/* List notes - Redesigned */}
       <section className="card" style={{ padding:16 }}>
         {err && <p className="prose" style={{ color:"crimson" }}>{err}</p>}
         {loading ? <LoadingSpinner text="Loading notes..." variant="compact" /> : (
           list.length === 0 ? <p className="prose" style={{ margin:0 }}>No notes for {date}.</p> : (
-            <ul style={{ listStyle:"none", padding:0, margin:0, display:"grid", gap:10 }}>
+            <div className="notes-grid" style={{ display:"grid", gap:12 }}>
               {list.map(n=>(
-                <li key={n.id} className="panel" style={{ padding:12, display:"grid", gap:6 }}>
-                  <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-                    <input type="checkbox" checked={n.done} onChange={()=>toggleDone(n)} />
-                    <div className="ui-mono" style={{ fontWeight:600 }}>{n.title || "(untitled)"}</div>
-                    {n.pinned && <span className="chip">Pinned</span>}
-                    <div style={{ flex:1 }} />
-                    <button 
-                      className="btn" 
-                      onClick={() => syncNoteToCalendar(n.id)}
-                      disabled={syncing}
-                      style={{ fontSize: "12px", padding: "4px 8px" }}
-                    >
-                      📅
-                    </button>
-                    <span className="chip">{n.date}</span>
+                <div key={n.id} className={`note-card ${n.done ? 'completed' : ''}`}>
+                  <div className="note-header">
+                    <div className="note-checkbox">
+                      <input 
+                        type="checkbox" 
+                        checked={n.done} 
+                        onChange={()=>toggleDone(n)}
+                        className="note-checkbox-input"
+                      />
+                    </div>
+                    <div className="note-content">
+                      <div className="note-title">
+                        {n.title || "(untitled)"}
+                      </div>
+                      {n.body && (
+                        <div className="note-body">
+                          {n.body}
+                        </div>
+                      )}
+                    </div>
+                    <div className="note-meta">
+                      <div className="note-tags">
+                        {n.pinned && <span className="note-tag pinned">📌 Pinned</span>}
+                        <span className="note-tag date">{n.date}</span>
+                      </div>
+                      <button 
+                        className="note-sync-btn" 
+                        onClick={() => syncNoteToCalendar(n.id)}
+                        disabled={syncing}
+                        title="Sync to calendar"
+                      >
+                        📅
+                      </button>
+                    </div>
                   </div>
-                  {n.body && <p className="prose" style={{ margin:0 }}>{n.body}</p>}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )
         )}
       </section>
+
+      <style jsx>{`
+        .notes-grid {
+          display: grid;
+          gap: 12px;
+        }
+        
+        .note-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 16px;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .note-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+        
+        .note-header {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 12px;
+          align-items: flex-start;
+        }
+        
+        .note-checkbox {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          margin-top: 2px;
+        }
+        
+        .note-checkbox-input {
+          width: 18px;
+          height: 18px;
+          accent-color: var(--accent);
+          cursor: pointer;
+        }
+        
+        .note-content {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 0;
+        }
+        
+        .note-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: var(--text);
+          line-height: 1.3;
+          word-break: break-word;
+        }
+        
+        .note-body {
+          color: var(--muted);
+          font-size: 0.9rem;
+          line-height: 1.4;
+          word-break: break-word;
+        }
+        
+        .note-meta {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          align-items: flex-end;
+          min-width: 0;
+        }
+        
+        .note-tags {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-end;
+        }
+        
+        .note-tag {
+          font-size: 0.75rem;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background: var(--accent);
+          color: var(--accent-contrast);
+          white-space: nowrap;
+        }
+        
+        .note-tag.pinned {
+          background: var(--accent);
+          color: var(--accent-contrast);
+        }
+        
+        .note-tag.date {
+          background: var(--panel);
+          color: var(--muted);
+          border: 1px solid var(--border);
+          font-family: var(--font-mono);
+        }
+        
+        .note-sync-btn {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 6px 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 14px;
+          color: var(--muted);
+        }
+        
+        .note-sync-btn:hover {
+          background: var(--accent);
+          color: var(--accent-contrast);
+          border-color: var(--accent);
+        }
+        
+        .note-sync-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        /* Completed note styling */
+        .note-card.completed .note-title {
+          text-decoration: line-through;
+          opacity: 0.6;
+        }
+        
+        .note-card.completed .note-body {
+          opacity: 0.6;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+          .note-header {
+            grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          
+          .note-checkbox {
+            justify-self: flex-start;
+          }
+          
+          .note-meta {
+            align-items: flex-start;
+            flex-direction: row;
+            justify-content: space-between;
+          }
+          
+          .note-tags {
+            flex-direction: row;
+            align-items: center;
+          }
+        }
+
+        /* New styles for AI summary card */
+        .ai-summary-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .ai-summary-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .ai-summary-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .ai-summary-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .ai-summary-title .ai-chip {
+          background: var(--accent);
+          color: var(--accent-contrast);
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+
+        .ai-summary-title .ai-date {
+          font-size: 1rem;
+          color: var(--text);
+          font-weight: 500;
+        }
+
+        .ai-summary-controls {
+          display: flex;
+          gap: 8px;
+        }
+
+        .ai-summary-content {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .ai-error, .ai-empty-state, .ai-prompt, .ai-loading {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px;
+          border-radius: var(--radius-1);
+          background: var(--panel-light);
+          border: 1px solid var(--border-light);
+        }
+
+        .ai-error .error-icon, .ai-empty-state .empty-icon, .ai-prompt .prompt-icon, .ai-loading .loading-spinner {
+          font-size: 1.2rem;
+          color: var(--accent);
+        }
+
+        .ai-error .error-text, .ai-empty-state .empty-text, .ai-prompt .prompt-text, .ai-loading .loading-text {
+          font-size: 0.9rem;
+          color: var(--muted);
+          line-height: 1.4;
+        }
+
+        .ai-summary-list {
+          background: var(--panel-light);
+          border: 1px solid var(--border-light);
+          border-radius: var(--radius-1);
+          padding: 12px;
+        }
+
+        .summary-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-header .summary-icon {
+          font-size: 1rem;
+          color: var(--accent);
+        }
+
+        .summary-header .summary-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: var(--text);
+        }
+
+        .summary-bullets {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .summary-bullet {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          margin-bottom: 6px;
+        }
+
+        .summary-bullet .bullet-marker {
+          font-size: 0.8rem;
+          color: var(--accent);
+        }
+
+        .summary-bullet .bullet-text {
+          font-size: 0.9rem;
+          color: var(--text);
+          line-height: 1.4;
+        }
+
+        .ai-loading .loading-spinner {
+          border: 4px solid var(--border);
+          border-top: 4px solid var(--accent);
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* New styles for sync options card */
+        .sync-options-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .sync-options-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .sync-options-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .sync-options-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .sync-options-title .sync-icon {
+          font-size: 1rem;
+          color: var(--accent);
+        }
+
+        .sync-options-title .sync-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: var(--text);
+        }
+
+        .sync-options-controls {
+          display: flex;
+          gap: 8px;
+        }
+
+        .sync-options-grid {
+          display: grid;
+          gap: 12px;
+        }
+
+        .sync-option-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sync-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .sync-label .label-text {
+          font-size: 0.9rem;
+          color: var(--muted);
+          font-weight: 500;
+        }
+
+        .sync-input {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          background: var(--input);
+          color: var(--text);
+          font-size: 0.9rem;
+          transition: all 0.2s ease;
+        }
+
+        .sync-input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        .sync-checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        .sync-checkbox {
+          width: 18px;
+          height: 18px;
+          accent-color: var(--accent);
+          cursor: pointer;
+        }
+
+        .sync-checkbox-label .checkbox-text {
+          font-size: 0.9rem;
+          color: var(--text);
+          font-weight: 500;
+        }
+
+        .sync-color-input {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          background: var(--input);
+          color: var(--text);
+          font-size: 0.9rem;
+          transition: all 0.2s ease;
+        }
+
+        .sync-color-input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        /* New styles for add note card */
+        .add-note-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .add-note-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .add-note-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .add-note-header .add-note-icon {
+          font-size: 1.2rem;
+          color: var(--accent);
+        }
+
+        .add-note-header .add-note-title {
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: var(--text);
+        }
+
+        .add-note-form {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-label {
+          font-size: 0.9rem;
+          color: var(--muted);
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+
+        .form-input, .form-textarea {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          background: var(--input);
+          color: var(--text);
+          font-size: 0.9rem;
+          transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        .form-textarea {
+          min-height: 80px;
+          resize: vertical;
+        }
+
+        .form-actions {
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        /* New styles for toolbar card */
+        .toolbar-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 12px 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .toolbar-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .toolbar-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .toolbar-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .toolbar-icon {
+          font-size: 1.5rem;
+          color: var(--accent);
+        }
+
+        .toolbar-title {
+          font-weight: 600;
+          font-size: 1.2rem;
+          color: var(--text);
+        }
+
+        .date-selector {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .date-label {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .date-text {
+          font-size: 0.9rem;
+          color: var(--muted);
+          font-weight: 500;
+        }
+
+        .date-input {
+          width: 120px;
+          padding: 8px 12px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          background: var(--input);
+          color: var(--text);
+          font-size: 0.9rem;
+          transition: all 0.2s ease;
+        }
+
+        .date-input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        .toolbar-right {
+          display: flex;
+          gap: 8px;
+        }
+
+        .btn-icon {
+          font-size: 0.9rem;
+          color: var(--muted);
+        }
+
+        .btn-text {
+          font-size: 0.9rem;
+          color: var(--text);
+          font-weight: 500;
+        }
+      `}</style>
     </div>
   );
 }
