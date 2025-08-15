@@ -16,7 +16,7 @@ export default function DailyBrief() {
     const { token } = useAuth();
     const [length, setLength] = useState("detailed"); // "tldr" | "detailed"
     
-    // Use optimized fetching hook with background loading
+    // Use optimized fetching hook with aggressive caching and smart loading
     const { 
         data: digestData, 
         loading, 
@@ -27,43 +27,69 @@ export default function DailyBrief() {
         digestLength: length,
         immediate: !!token,
         enableBackgroundRefresh: true,
-        backgroundRefreshInterval: 30000, // 30 seconds for faster updates
-        staleTime: 300000 // 5 minutes
+        backgroundRefreshInterval: 120000, // 2 minutes - less aggressive
+        staleTime: 900000, // 15 minutes - longer cache
+        cacheKey: `digest-${todayUTC()}-${length}` // Better caching
     });
 
-    // Smart loading state - show cached data immediately if available
+    // Smart loading state with optimistic updates and better caching
     const [state, setState] = useState({ 
-        loading: !digestData, 
+        loading: !digestData?.item, 
         err: error, 
-        digest: digestData?.item || null 
+        digest: digestData?.item || null,
+        lastGenerated: null
     });
 
-    // Update state when data changes
+    // Update state when data changes - with optimistic updates
     useEffect(() => {
         if (digestData?.item) {
-            setState({ loading: false, err: null, digest: digestData.item });
+            setState(prev => ({ 
+                ...prev,
+                loading: false, 
+                err: null, 
+                digest: digestData.item,
+                lastGenerated: new Date().toISOString()
+            }));
         } else if (error) {
-            setState({ loading: false, err: error, digest: null });
+            setState(prev => ({ ...prev, loading: false, err: error }));
         }
     }, [digestData, error]);
 
-    // Auto-generate digest if none exists
+    // Show cached data immediately while loading
+    const displayDigest = state.digest || digestData?.item;
+
+    // Smart auto-generation - only when really needed
     useEffect(() => {
-        if (token && !loading && !state.digest && !state.err) {
-            handleGenerate({ refresh: true });
+        if (token && !loading && !displayDigest && !state.err) {
+            // Check if we already tried to generate today
+            const today = todayUTC();
+            const lastTry = localStorage.getItem(`digest-last-try-${today}`);
+            const now = Date.now();
+            
+            if (!lastTry || (now - parseInt(lastTry)) > 300000) { // 5 minutes
+                localStorage.setItem(`digest-last-try-${today}`, now.toString());
+                handleGenerate({ refresh: true });
+            }
         }
-    }, [token, loading, state.digest, state.err]);
+    }, [token, loading, displayDigest, state.err]);
 
     const handleGenerate = useCallback(async (opts = {}) => {
         setState(s => ({ ...s, loading: true }));
         try {
+            // Show optimistic loading state
             const { item } = await api.generate(token, todayUTC(), { limit: 12, length, ...opts });
-            setState({ loading: false, err: "", digest: item });
+            setState(prev => ({ 
+                ...prev,
+                loading: false, 
+                err: "", 
+                digest: item,
+                lastGenerated: new Date().toISOString()
+            }));
             
-            // Refresh the cached data
-            refresh();
+            // Refresh the cached data in background
+            setTimeout(() => refresh(), 100);
         } catch (e) { 
-            setState({ loading: false, err: e.message, digest: null }); 
+            setState(prev => ({ ...prev, loading: false, err: e.message })); 
         }
     }, [token, length, refresh]);
 
@@ -89,9 +115,11 @@ export default function DailyBrief() {
     }, [token, length, refresh]);
 
     if (!token) return <p className="prose">Please <Link to="/login">log in</Link> to see your daily brief.</p>;
-    if (state.loading) return <LoadingSpinner text="Loading daily brief..." variant="compact" />;
+    
+    // Show loading only if we have no data at all
+    if (state.loading && !displayDigest) return <LoadingSpinner text="Loading daily brief..." variant="compact" />;
 
-    const d = state.digest;
+    const d = displayDigest;
 
     return (
         <div className="fade-in page">
@@ -114,7 +142,18 @@ export default function DailyBrief() {
                 <div className="toolbar-right">
                     {/* Performance indicators */}
                     <div className="flex-responsive-sm">
-                        {isStale && (
+                        {state.loading && (
+                            <span className="kicker" style={{ 
+                                color: "#3b82f6", 
+                                padding: "4px 8px", 
+                                background: "#dbeafe", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #93c5fd"
+                            }}>
+                                ⚡ Updating...
+                            </span>
+                        )}
+                        {isStale && !state.loading && (
                             <span className="kicker" style={{ 
                                 color: "#f59e0b", 
                                 padding: "4px 8px", 
@@ -122,10 +161,10 @@ export default function DailyBrief() {
                                 borderRadius: "var(--radius-1)",
                                 border: "1px solid #fbbf24"
                             }}>
-                                Stale data
+                                📊 Cached
                             </span>
                         )}
-                        {state.digest && (
+                        {displayDigest && !isStale && !state.loading && (
                             <span className="kicker" style={{ 
                                 color: "#10b981", 
                                 padding: "4px 8px", 
@@ -133,7 +172,19 @@ export default function DailyBrief() {
                                 borderRadius: "var(--radius-1)",
                                 border: "1px solid #34d399"
                             }}>
-                                Fresh
+                                ✅ Fresh
+                            </span>
+                        )}
+                        {state.lastGenerated && (
+                            <span className="kicker" style={{ 
+                                color: "#6b7280", 
+                                padding: "4px 8px", 
+                                background: "#f3f4f6", 
+                                borderRadius: "var(--radius-1)",
+                                border: "1px solid #d1d5db",
+                                fontSize: "11px"
+                            }}>
+                                {new Date(state.lastGenerated).toLocaleTimeString()}
                             </span>
                         )}
                     </div>
