@@ -5,20 +5,125 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Login(){
   const { login, loading } = useAuth();
   const nav = useNavigate();
-  const [email,setEmail]=useState(""); const [password,setPassword]=useState("");
-  const [err,setErr]=useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
 
-  async function onSubmit(e){ e.preventDefault(); setErr("");
-    try{ await login(email,password); nav("/digest"); } catch(e){ setErr(e.message); } }
+  function validateForm() {
+    const errors = {};
+    
+    if (!email.trim()) {
+      errors.email = "Email is required";
+    } else if (!email.includes('@')) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    if (!password) {
+      errors.password = "Password is required";
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    setValidationErrors({});
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    try {
+      await login(email, password);
+      nav("/digest");
+    } catch (e) {
+      // Handle different error types
+      if (e.message.includes("JWT_SECRET") || e.message.includes("Server configuration")) {
+        setErr("Server configuration error. Please try again later or contact support.");
+      } else if (e.message.includes("Invalid email or password")) {
+        setErr("Invalid email or password. Please check your credentials.");
+      } else {
+        setErr(e.message);
+      }
+    }
+  }
 
   return (
     <div className="panel main fade-in" style={{padding:24}}>
+      {/* Announcement Banner */}
+      {showAnnouncement && (
+        <div 
+          className="announcement-banner"
+          style={{
+            background: "#f0f9ff",
+            color: "#0369a1",
+            padding: "12px 16px",
+            borderRadius: "6px",
+            marginBottom: "20px",
+            textAlign: "center",
+            border: "1px solid #bae6fd",
+            position: "relative"
+          }}
+        >
+          <button
+            onClick={() => setShowAnnouncement(false)}
+            aria-label="Dismiss announcement"
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              background: "transparent",
+              border: "none",
+              color: "#0369a1",
+              cursor: "pointer",
+              fontSize: "16px",
+              padding: "0",
+              width: "20px",
+              height: "20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            ×
+          </button>
+          <span style={{fontSize: "14px"}}>
+            ✅ Authentication issues resolved - login and signup now work properly!
+          </span>
+        </div>
+      )}
+
       <h2 className="ui-mono" style={{marginTop:0}}>Log in</h2>
       {err && <p style={{color:"crimson"}}>{err}</p>}
       <form onSubmit={onSubmit} style={{maxWidth:420, display:"grid", gap:12}}>
-        <label>Email</label><input value={email} onChange={e=>setEmail(e.target.value)} />
-        <label>Password</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} />
-        <button className="btn primary" disabled={loading}>{loading?"…":"Log in"}</button>
+        <div>
+          <label>Email</label>
+          <input 
+            value={email} 
+            onChange={e=>setEmail(e.target.value)} 
+            className={validationErrors.email ? "error" : ""}
+          />
+          {validationErrors.email && <span style={{color:"crimson", fontSize:"0.9em"}}>{validationErrors.email}</span>}
+        </div>
+        
+        <div>
+          <label>Password</label>
+          <input 
+            type="password" 
+            value={password} 
+            onChange={e=>setPassword(e.target.value)} 
+            className={validationErrors.password ? "error" : ""}
+          />
+          {validationErrors.password && <span style={{color:"crimson", fontSize:"0.9em"}}>{validationErrors.password}</span>}
+        </div>
+        
+        <button className="btn primary" disabled={loading}>
+          {loading ? "Logging in..." : "Log in"}
+        </button>
       </form>
       <p className="prose" style={{marginTop:12}}>No account? <Link to="/signup">Sign up</Link></p>
     </div>

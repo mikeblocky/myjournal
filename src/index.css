@@ -8,7 +8,25 @@ input, textarea{
   width:100%; padding:12px 14px;
   background: var(--panel); border:1px solid var(--border);
   border-radius: var(--radius-1); color: var(--text);
+  transition: border-color 0.2s ease;
 }
+
+input:focus, textarea:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+input.error, textarea.error{
+  border-color: #dc2626;
+  background: color-mix(in oklab, var(--panel) 95%, #dc2626 5%);
+}
+
+input.error:focus, textarea.error:focus{
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px color-mix(in oklab, #dc2626 20%, transparent);
+}
+
 label{ display:block; margin-bottom:6px; font-size: 12px; color: var(--muted); }
 
 /* readable content */
@@ -83,6 +101,20 @@ blockquote{
   max-width: 100%;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* Announcement banner animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.announcement-banner {
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Responsive adjustments for AI chip */

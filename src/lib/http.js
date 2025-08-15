@@ -8,7 +8,7 @@ export async function http(path, { method="GET", token, body } = {}) {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    credentials: "omit", // important for CORS "*"
+    credentials: "include", // Changed from "omit" to "include" for CORS with credentials
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
