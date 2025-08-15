@@ -22,8 +22,9 @@ export default function DailyBrief() {
         refresh, 
         isStale 
     } = useDailyDigest(token, todayUTC(), {
+        digestLength: length,
         immediate: !!token,
-        backgroundRefresh: true,
+        enableBackgroundRefresh: true,
         backgroundRefreshInterval: 60000, // 1 minute
         staleTime: 300000 // 5 minutes
     });

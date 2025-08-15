@@ -66,10 +66,10 @@ export function useOptimizedFetch(apiCall, dependencies = [], options = {}) {
   }, [fetchData]);
 
   const backgroundRefresh = useCallback(() => {
-    if (backgroundRefresh && lastFetched && Date.now() - lastFetched > staleTime) {
+    if (enableBackgroundRefresh && lastFetched && Date.now() - lastFetched > staleTime) {
       fetchData(true);
     }
-  }, [backgroundRefresh, lastFetched, staleTime, fetchData]);
+  }, [enableBackgroundRefresh, lastFetched, staleTime, fetchData]);
 
   // Initial fetch
   useEffect(() => {
@@ -80,7 +80,7 @@ export function useOptimizedFetch(apiCall, dependencies = [], options = {}) {
 
   // Background refresh setup
   useEffect(() => {
-    if (backgroundRefresh && backgroundRefreshInterval > 0) {
+    if (enableBackgroundRefresh && backgroundRefreshInterval > 0) {
       backgroundTimerRef.current = setInterval(backgroundRefresh, backgroundRefreshInterval);
       
       return () => {
@@ -89,7 +89,7 @@ export function useOptimizedFetch(apiCall, dependencies = [], options = {}) {
         }
       };
     }
-  }, [backgroundRefresh, backgroundRefreshInterval, backgroundRefresh]);
+  }, [enableBackgroundRefresh, backgroundRefreshInterval, backgroundRefresh]);
 
   // Cleanup
   useEffect(() => {
@@ -143,7 +143,7 @@ export function useArticlesList(token, options = {}) {
 
   return useOptimizedFetch(apiCall, [page, limit, search, tag], {
     immediate,
-    backgroundRefresh: false, // Articles don't need background refresh
+    enableBackgroundRefresh: false, // Articles don't need background refresh
     staleTime: 300000, // 5 minutes for articles
     ...options
   });
@@ -152,7 +152,7 @@ export function useArticlesList(token, options = {}) {
 // Specialized hook for daily digest
 export function useDailyDigest(token, date, options = {}) {
   const {
-    length = "detailed",
+    digestLength = "detailed",
     immediate = true
   } = options;
 
@@ -162,7 +162,7 @@ export function useDailyDigest(token, date, options = {}) {
 
   return useOptimizedFetch(apiCall, [date], {
     immediate,
-    backgroundRefresh: true,
+    enableBackgroundRefresh: true,
     backgroundRefreshInterval: 60000, // 1 minute for digest
     staleTime: 300000, // 5 minutes
     ...options

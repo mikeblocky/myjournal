@@ -31,7 +31,7 @@ export default function ArticlesList(){
     limit,
     search: q,
     immediate: !!token,
-    backgroundRefresh: false,
+    enableBackgroundRefresh: false,
     staleTime: 300000 // 5 minutes
   });
 
