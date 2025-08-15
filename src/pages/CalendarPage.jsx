@@ -258,6 +258,22 @@ export default function CalendarPage(){
     }catch(e){ setPlan({ loading:false, item:null, nothingToDo:true, err:e.message }); }
   }
 
+  // Fix truncated time information in AI-generated plans
+  function fixTruncatedTime(text) {
+    // Fix patterns like ":00–09:30" to "09:00–09:30"
+    // Fix patterns like ":30–10:00" to "09:30–10:00"
+    return text.replace(/:(\d{2})–(\d{2}):(\d{2})/g, (match, minutes, hours, mins) => {
+      // If it's a time range starting with minutes, it's likely missing the hour
+      if (parseInt(hours) < 24) {
+        // This looks like a truncated time, try to infer the hour
+        const endHour = parseInt(hours);
+        const startHour = Math.max(0, endHour - 1); // Assume 1 hour duration
+        return `${startHour.toString().padStart(2, '0')}:${minutes}–${hours}:${mins}`;
+      }
+      return match;
+    });
+  }
+
   function toggleViewMode() {
     if (viewMode === "month") {
       setViewMode("week");
@@ -347,7 +363,9 @@ export default function CalendarPage(){
         )}
         {!plan.loading && !plan.nothingToDo && plan.item?.agenda?.length > 0 && (
           <ul className="prose">
-            {plan.item.agenda.map((b,i)=><li key={i}>{b}</li>)}
+            {plan.item.agenda.map((b,i)=>(
+              <li key={i}>{fixTruncatedTime(b)}</li>
+            ))}
           </ul>
         )}
       </section>
