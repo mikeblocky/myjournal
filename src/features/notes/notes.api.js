@@ -17,3 +17,10 @@ export const getDaily = (token, date) =>
 
 export const generateDaily = (token, date) =>
   http(`/notes/daily/${encodeURIComponent(date)}/generate`, { method: "POST", token });
+
+// Calendar sync functions
+export const syncToCalendar = (token, { noteId, startTime="09:00", endTime="10:00", allDay=false, location="", color="" }) =>
+  http("/notes/sync-to-calendar", { method: "POST", token, body: { noteId, startTime, endTime, allDay, location, color } });
+
+export const syncDateToCalendar = (token, date, { startTime="09:00", endTime="10:00", allDay=false, location="", color="" }) =>
+  http(`/notes/daily/${encodeURIComponent(date)}/sync-to-calendar`, { method: "POST", token, body: { startTime, endTime, allDay, location, color } });

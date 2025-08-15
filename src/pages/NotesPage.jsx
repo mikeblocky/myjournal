@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../features/notes/notes.api";
 import LoadingSpinner from "../components/LoadingSpinner";
-
-function todayUTC(){ return new Date().toISOString().slice(0,10); }
+import { today } from "../lib/date";
 
 export default function NotesPage(){
   const { token } = useAuth();
-  const [date, setDate] = useState(todayUTC());
+  const [date, setDate] = useState(today());
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -16,6 +15,10 @@ export default function NotesPage(){
   const [saving, setSaving] = useState(false);
 
   const [daily, setDaily] = useState({ loading: true, item: null, nothingToDo: false, err: "" });
+
+  // Sync state
+  const [syncOptions, setSyncOptions] = useState({ startTime: "09:00", endTime: "10:00", allDay: false, location: "", color: "" });
+  const [syncing, setSyncing] = useState(false);
 
   async function loadNotes(){
     if(!token) return;
@@ -68,6 +71,40 @@ export default function NotesPage(){
     }
   }
 
+  // Sync individual note to calendar
+  async function syncNoteToCalendar(noteId) {
+    setSyncing(true);
+    try {
+      const result = await api.syncToCalendar(token, { 
+        noteId, 
+        ...syncOptions 
+      });
+      alert(`Note synced to calendar successfully!`);
+    } catch (e) {
+      alert(`Failed to sync note: ${e.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  // Sync all notes for the date to calendar
+  async function syncAllNotesToCalendar() {
+    if (list.length === 0) {
+      alert("No notes to sync for this date");
+      return;
+    }
+
+    setSyncing(true);
+    try {
+      const result = await api.syncDateToCalendar(token, date, syncOptions);
+      alert(`Synced ${result.items.length} notes to calendar for ${date}!`);
+    } catch (e) {
+      alert(`Failed to sync notes: ${e.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   return (
     <div className="fade-in" style={{ display:"grid", gap:16 }}>
       <div className="panel" style={{ padding:12, display:"flex", gap:12, alignItems:"center", flexWrap:"wrap" }}>
@@ -104,9 +141,76 @@ export default function NotesPage(){
         )}
 
         {!daily.loading && !daily.item && list.length > 0 && (
-          <p className="prose" style={{ margin:0, color:"var(--muted)" }}>No summary yet. Click “Summarize today”.</p>
+          <p className="prose" style={{ margin:0, color:"var(--muted)" }}>No summary yet. Click "Summarize today".</p>
         )}
       </section>
+
+      {/* Calendar Sync Options */}
+      {list.length > 0 && (
+        <section className="card" style={{ padding:16 }}>
+          <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", marginBottom:12 }}>
+            <span className="kicker">📅 Calendar Sync</span>
+            <div style={{ flex:1 }} />
+            <button 
+              className="btn primary" 
+              onClick={syncAllNotesToCalendar} 
+              disabled={syncing}
+            >
+              {syncing ? "Syncing..." : `Sync ${list.length} notes to calendar`}
+            </button>
+          </div>
+          
+          <div style={{ display:"grid", gap:8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+            <label>
+              Start Time:
+              <input 
+                type="time" 
+                value={syncOptions.startTime} 
+                onChange={e => setSyncOptions(opt => ({ ...opt, startTime: e.target.value }))}
+                disabled={syncOptions.allDay}
+              />
+            </label>
+            
+            <label>
+              End Time:
+              <input 
+                type="time" 
+                value={syncOptions.endTime} 
+                onChange={e => setSyncOptions(opt => ({ ...opt, endTime: e.target.value }))}
+                disabled={syncOptions.allDay}
+              />
+            </label>
+            
+            <label style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <input 
+                type="checkbox" 
+                checked={syncOptions.allDay} 
+                onChange={e => setSyncOptions(opt => ({ ...opt, allDay: e.target.checked }))}
+              />
+              All Day Event
+            </label>
+            
+            <label>
+              Location:
+              <input 
+                type="text" 
+                placeholder="Optional location"
+                value={syncOptions.location} 
+                onChange={e => setSyncOptions(opt => ({ ...opt, location: e.target.value }))}
+              />
+            </label>
+            
+            <label>
+              Color:
+              <input 
+                type="color" 
+                value={syncOptions.color} 
+                onChange={e => setSyncOptions(opt => ({ ...opt, color: e.target.value }))}
+              />
+            </label>
+          </div>
+        </section>
+      )}
 
       {/* Add note */}
       <form onSubmit={onCreate} className="card" style={{ padding:16, display:"grid", gap:8 }}>
@@ -142,6 +246,14 @@ export default function NotesPage(){
                     <div className="ui-mono" style={{ fontWeight:600 }}>{n.title || "(untitled)"}</div>
                     {n.pinned && <span className="chip">Pinned</span>}
                     <div style={{ flex:1 }} />
+                    <button 
+                      className="btn" 
+                      onClick={() => syncNoteToCalendar(n.id)}
+                      disabled={syncing}
+                      style={{ fontSize: "12px", padding: "4px 8px" }}
+                    >
+                      📅
+                    </button>
                     <span className="chip">{n.date}</span>
                   </div>
                   {n.body && <p className="prose" style={{ margin:0 }}>{n.body}</p>}

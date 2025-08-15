@@ -71,7 +71,7 @@ blockquote{
   text-transform: uppercase; 
   color: var(--text);
   padding: 8px 16px; 
-  border-radius: 36px; 
+  border-radius: 32px; 
   position: relative;
   background: var(--panel);
   border: 1px solid transparent;
@@ -89,7 +89,7 @@ blockquote{
 @media (max-width: 768px) {
   .ai-chip {
     padding: 6px 12px;
-    border-radius: 22px;
+    border-radius: 24px;
     font-size: 10px;
   }
   
@@ -102,7 +102,7 @@ blockquote{
 @media (max-width: 480px) {
   .ai-chip {
     padding: 5px 10px;
-    border-radius: 18px;
+    border-radius: 20px;
     font-size: 9px;
   }
   
@@ -186,13 +186,24 @@ blockquote{
 
 /* Rainbow border animation for AI card with content */
 .ai-card:has(p:not(:empty)), .ai-card:has(ul:not(:empty)) {
-  border-image: linear-gradient(
+  position: relative;
+}
+
+.ai-card:has(p:not(:empty))::before, 
+.ai-card:has(ul:not(:empty))::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
     45deg,
     var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
     var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)
-  ) 1;
-  border-image-slice: 1;
+  );
+  z-index: -1;
   animation: rainbow-border 4s linear infinite;
+  /* Ensure it follows the exact curve */
+  border-radius: inherit !important;
 }
 
 .ai-card{
@@ -245,7 +256,7 @@ blockquote{
 }
 
 /* Subtle rainbow background pattern */
-.ai-card::after {
+.ai-card .bg-pattern {
   content: "";
   position: absolute;
   top: 0;
@@ -259,6 +270,8 @@ blockquote{
   opacity: 0.03;
   z-index: -4;
   animation: rainbow-bg-float 8s ease-in-out infinite;
+  /* Ensure background pattern follows the curve */
+  border-radius: inherit;
 }
 
 .ai-card:hover {
@@ -276,6 +289,7 @@ blockquote{
 }
 
 /* Rainbow flowing halo with multiple layers */
+/* Structure: ::before = main rainbow glow, ::after = secondary rainbow layer */
 .ai-chip::before,
 .ai-card::before{
   content:"";
@@ -289,11 +303,27 @@ blockquote{
   filter: blur(12px); opacity:.7;
   animation: rainbow-flow 8s linear infinite;
 
-  /* punch out the middle so it reads like an outline */
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  padding: 3px;
-  -webkit-mask-composite: xor; mask-composite: exclude;
+  /* Create outline effect - no mask to ensure rainbow appears outside */
+  /* The inset positioning creates the outline effect naturally */
+  /* Ensure rainbow outline matches the curve exactly */
+  border-radius: inherit !important;
+  /* Ensure the effect appears outside the element */
+  pointer-events: none;
+}
+
+/* Enhanced rainbow effects for AI cards with content */
+.ai-card:has(p:not(:empty)), 
+.ai-card:has(ul:not(:empty)) {
+  /* Remove border-image and use enhanced rainbow glow instead */
+  border: 1px solid transparent;
+}
+
+.ai-card:has(p:not(:empty))::before, 
+.ai-card:has(ul:not(:empty))::before {
+  /* Enhanced glow for content cards */
+  filter: blur(15px) brightness(1.1);
+  opacity: 0.8;
+  animation: rainbow-flow 6s linear infinite;
 }
 
 /* Responsive rainbow effects */
@@ -330,11 +360,10 @@ blockquote{
   filter: blur(8px); opacity:.4;
   animation: rainbow-wave 6s ease-in-out infinite, rainbow-pulse 4s ease-in-out infinite;
   
-  /* punch out the middle */
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  padding: 1px;
-  -webkit-mask-composite: xor; mask-composite: exclude;
+  /* Create outline effect - no mask to ensure rainbow appears outside */
+  /* The inset positioning creates the outline effect naturally */
+  /* Ensure rainbow outline matches the curve exactly */
+  border-radius: inherit !important;
 }
 
 /* Responsive secondary rainbow effects */
@@ -357,11 +386,7 @@ blockquote{
 }
 
 /* Third rainbow layer for extra magic */
-.ai-card {
-  position: relative;
-}
-
-.ai-card::before {
+.ai-card .third-layer {
   content: "";
   position: absolute;
   inset: -5px;
@@ -379,11 +404,10 @@ blockquote{
   opacity: 0.3;
   animation: rainbow-float 10s ease-in-out infinite;
   
-  /* punch out the middle */
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  padding: 5px;
-  -webkit-mask-composite: xor; mask-composite: exclude;
+  /* Create outline effect - no mask to ensure rainbow appears outside */
+  /* The inset positioning creates the outline effect naturally */
+  /* Ensure it follows the exact curve */
+  border-radius: inherit !important;
 }
 
 /* optional: subtle “wake up” on hover/focus without spinning */
@@ -393,7 +417,8 @@ blockquote{
 .ai-card:focus-within::before{
   opacity:.9;
   filter: blur(15px) brightness(1.2);
-  animation: rainbow-flow 4s linear infinite;
+  /* Keep the original animation, just enhance the effect */
+  animation-duration: 4s;
 }
 
 /* Focus rainbow effects */
@@ -413,7 +438,8 @@ blockquote{
 .ai-card:focus-within::after{
   opacity:.6;
   filter: blur(10px) brightness(1.1);
-  animation: rainbow-wave 3s ease-in-out infinite;
+  /* Keep the original animation, just enhance the effect */
+  animation-duration: 3s;
 }
 
 /* Focus rainbow effects for AI chip */
