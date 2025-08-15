@@ -64,6 +64,11 @@ export default function ArticlesList(){
     }
   }, [token, refresh]);
 
+  // Pagination function
+  const load = useCallback((newPage) => {
+    setPage(newPage);
+  }, []);
+
   // source list (chips)
   const hosts = useMemo(()=>{
     const set = new Set(items.map(a => hostFromUrl(a.url)).filter(Boolean));
@@ -154,7 +159,7 @@ export default function ArticlesList(){
         </div>
       )}
 
-      {err && <p className="prose" style={{ color:"crimson" }}>{err}</p>}
+
       {loading ? <LoadingSpinner text="Loading articles..." variant="compact" /> : (
         filtered.length === 0 ? <p className="prose">No articles found.</p> : (
           <section className="a-grid">
@@ -170,7 +175,7 @@ export default function ArticlesList(){
       <div style={{ display:"flex", gap:8, alignItems:"center", justifyContent:"center" }}>
         <button className="btn" disabled={page<=1} onClick={()=>load(page-1)}>Prev</button>
         <span className="kicker">Page {page}</span>
-        <button className="btn" disabled={items.length < limit} onClick={()=>load(page+1)}>Next</button>
+        <button className="btn" disabled={filtered.length < limit} onClick={()=>load(page+1)}>Next</button>
       </div>
     </div>
   );
