@@ -56,16 +56,16 @@
   50% { background-position: 100% 50%; }
 }
 
-/* AI Header Section - Subtle Design */
+/* AI Header Section - Brown Theme */
 .ai-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
   border-radius: var(--radius-2) var(--radius-2) 0 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #f59e0b;
   gap: 16px;
 }
 
@@ -82,7 +82,7 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, #94a3b8, #64748b);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   border-radius: 50%;
   color: white;
   font-size: 14px;
@@ -243,11 +243,11 @@
   margin: 0 auto;
 }
 
-/* AI Generate Button - Subtle Design */
+/* AI Generate Button - Brown Design */
 .ai-generate-btn {
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0, #cbd5e1);
-  color: #475569;
-  border: 1px solid #cbd5e1;
+  background: linear-gradient(135deg, #fef3c7, #fde68a, #f59e0b);
+  color: #92400e;
+  border: 1px solid #f59e0b;
   padding: 10px 18px;
   border-radius: var(--radius-1);
   font-family: var(--font-ui);
@@ -259,9 +259,9 @@
 }
 
 .ai-generate-btn:hover {
-  background: linear-gradient(135deg, #e2e8f0, #cbd5e1, #94a3b8);
-  color: #334155;
-  border-color: #94a3b8;
+  background: linear-gradient(135deg, #fde68a, #f59e0b, #d97706);
+  color: #78350f;
+  border-color: #d97706;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
@@ -274,8 +274,8 @@
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  background: #f1f5f9;
-  color: #94a3b8;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 /* AI Status Indicators */

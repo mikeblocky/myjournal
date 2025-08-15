@@ -63,11 +63,17 @@ export default function DailyBrief() {
         if (token && !loading && !displayDigest && !state.err) {
             // Check if we already tried to generate today
             const today = todayUTC();
-            const lastTry = localStorage.getItem(`digest-last-try-${today}`);
-            const now = Date.now();
-            
-            if (!lastTry || (now - parseInt(lastTry)) > 300000) { // 5 minutes
-                localStorage.setItem(`digest-last-try-${today}`, now.toString());
+            try {
+                const lastTry = localStorage.getItem(`digest-last-try-${today}`);
+                const now = Date.now();
+                
+                if (!lastTry || (now - parseInt(lastTry)) > 300000) { // 5 minutes
+                    localStorage.setItem(`digest-last-try-${today}`, now.toString());
+                    handleGenerate({ refresh: true });
+                }
+            } catch (e) {
+                // Fallback if localStorage fails
+                console.warn('localStorage not available, proceeding with generation');
                 handleGenerate({ refresh: true });
             }
         }
