@@ -85,21 +85,34 @@ export default function DailyBrief() {
             {d && (
                 <>
                     {/* AI TL;DR with rainbow glow */}
-                    <section className="ai-card" style={{ marginBottom: 16 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                            <span className="ai-chip">✨ AI TL;DR</span>
-                            {!!d.topics?.length && (
-                                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                                    {d.topics.map((t, i) => <span key={i} className="chip ui-mono" style={{ fontSize: 12 }}>{t}</span>)}
+                    <section className="ai-tldr-section">
+                        <div className="ai-tldr-header">
+                            <div className="ai-tldr-title">
+                                <span className="ai-chip">✨ AI TL;DR</span>
+                                {!!d.topics?.length && (
+                                    <div className="ai-topics">
+                                        {d.topics.map((t, i) => <span key={i} className="topic-chip ui-mono">{t}</span>)}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="ai-tldr-meta">
+                                <span className="meta-label">Sources:</span>
+                                <div className="source-chips">
+                                    {(d.sources || []).map((s, i) => <span key={i} className="source-chip ui-mono">{s}</span>)}
                                 </div>
-                            )}
-                            <div style={{ flex: 1 }} />
-                            <span className="kicker">Sources:</span>
-                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                                {(d.sources || []).map((s, i) => <span key={i} className="chip ui-mono" style={{ fontSize: 11 }}>{s}</span>)}
                             </div>
                         </div>
-                        <p className="prose" style={{ margin: 0 }}>{d.tldr || "No summary."}</p>
+                        
+                        <div className="ai-tldr-content">
+                            {d.tldr ? (
+                                <div className="tldr-text">{d.tldr}</div>
+                            ) : (
+                                <div className="tldr-empty">
+                                    <span className="empty-icon">📝</span>
+                                    <span className="empty-text">No summary available.</span>
+                                </div>
+                            )}
+                        </div>
                     </section>
 
                     <Section title="Top stories" items={(d.items || []).filter(i => i.category === "top")} />
@@ -133,3 +146,145 @@ function Section({ title, items }) {
         </section>
     );
 }
+
+<style jsx>{`
+    .ai-tldr-section {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-1);
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .ai-tldr-section:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .ai-tldr-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+        gap: 12px;
+    }
+
+    .ai-tldr-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .ai-tldr-title .ai-chip {
+        background: var(--accent);
+        color: var(--accent-contrast);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .ai-topics {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .topic-chip {
+        background: var(--panel-light);
+        color: var(--muted);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .ai-tldr-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+
+    .meta-label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .source-chips {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .source-chip {
+        background: var(--panel-light);
+        color: var(--muted);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        border: 1px solid var(--border-light);
+        white-space: nowrap;
+    }
+
+    .ai-tldr-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .tldr-text {
+        font-size: 0.95rem;
+        color: var(--text);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .tldr-empty {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background: var(--panel-light);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-1);
+    }
+
+    .empty-icon {
+        font-size: 1rem;
+        color: var(--muted);
+    }
+
+    .empty-text {
+        font-size: 0.9rem;
+        color: var(--muted);
+        font-style: italic;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .ai-tldr-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .ai-tldr-meta {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .ai-topics, .source-chips {
+            gap: 4px;
+        }
+    }
+`}</style>

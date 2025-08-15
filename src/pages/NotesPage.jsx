@@ -135,7 +135,7 @@ export default function NotesPage(){
       </div>
 
       {/* AI daily summary */}
-      <section className="ai-summary-card">
+      <section className="ai-summary-section">
         <div className="ai-summary-header">
           <div className="ai-summary-title">
             <span className="ai-chip">✨ Daily AI Notes</span>
@@ -154,47 +154,61 @@ export default function NotesPage(){
 
         <div className="ai-summary-content">
           {daily.err && (
-            <div className="ai-error">
-              <span className="error-icon">⚠️</span>
-              <span className="error-text">{daily.err}</span>
+            <div className="ai-error-card">
+              <div className="error-header">
+                <span className="error-icon">⚠️</span>
+                <span className="error-title">Error</span>
+              </div>
+              <div className="error-content">{daily.err}</div>
             </div>
           )}
 
           {!daily.loading && daily.nothingToDo && (list.length === 0) && (
-            <div className="ai-empty-state">
-              <span className="empty-icon">✨</span>
-              <span className="empty-text">Nothing to do today.</span>
+            <div className="ai-empty-card">
+              <div className="empty-header">
+                <span className="empty-icon">✨</span>
+                <span className="empty-title">Nothing to do today</span>
+              </div>
+              <div className="empty-content">You have no notes for today.</div>
             </div>
           )}
 
           {!daily.loading && !daily.nothingToDo && daily.item?.bullets?.length > 0 && (
-            <div className="ai-summary-list">
+            <div className="ai-summary-card">
               <div className="summary-header">
-                <span className="summary-icon">📋</span>
-                <span className="summary-title">AI Generated Summary</span>
+                <span className="summary-icon"></span>
+                <span className="summary-title">Generated summary</span>
               </div>
-              <ul className="summary-bullets">
-                {daily.item.bullets.map((b,i)=>(
-                  <li key={i} className="summary-bullet">
-                    <span className="bullet-marker">•</span>
-                    <span className="bullet-text">{b}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="summary-content">
+                <ul className="summary-bullets">
+                  {daily.item.bullets.map((b,i)=>(
+                    <li key={i} className="summary-bullet">
+                      <span className="bullet-marker">•</span>
+                      <span className="bullet-text">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 
           {!daily.loading && !daily.item && list.length > 0 && (
-            <div className="ai-prompt">
-              <span className="prompt-icon">💡</span>
-              <span className="prompt-text">No summary yet. Click "Generate Summary" to create an AI-powered summary of your notes.</span>
+            <div className="ai-prompt-card">
+              <div className="prompt-header">
+                <span className="prompt-icon">💡</span>
+                <span className="prompt-title">Ready to summarize</span>
+              </div>
+              <div className="prompt-content">Click "Generate Summary" to create an AI-powered summary of your notes.</div>
             </div>
           )}
 
           {daily.loading && (
-            <div className="ai-loading">
-              <div className="loading-spinner"></div>
-              <span className="loading-text">Analyzing your notes and generating insights...</span>
+            <div className="ai-loading-card">
+              <div className="loading-header">
+                <div className="loading-spinner"></div>
+                <span className="loading-title">Generating Summary</span>
+              </div>
+              <div className="loading-content">Analyzing your notes and generating insights...</div>
             </div>
           )}
         </div>
@@ -206,7 +220,7 @@ export default function NotesPage(){
           <div className="sync-options-header">
             <div className="sync-options-title">
               <span className="sync-icon">📅</span>
-              <span className="sync-title">Calendar Sync</span>
+              <span className="sync-title">Calendar sync</span>
             </div>
             <div className="sync-options-controls">
               <button 
@@ -254,7 +268,7 @@ export default function NotesPage(){
                   onChange={e => setSyncOptions(opt => ({ ...opt, allDay: e.target.checked }))}
                   className="sync-checkbox"
                 />
-                <span className="checkbox-text">All Day Event</span>
+                <span className="checkbox-text">All day event</span>
               </label>
             </div>
             
@@ -289,8 +303,8 @@ export default function NotesPage(){
       {/* Add note */}
       <form onSubmit={onCreate} className="add-note-card">
         <div className="add-note-header">
-          <span className="add-note-icon">✏️</span>
-          <span className="add-note-title">Add New Note</span>
+          <span className="add-note-icon"></span>
+          <span className="add-note-title">Add new note</span>
         </div>
         
         <div className="add-note-form">
@@ -529,7 +543,7 @@ export default function NotesPage(){
         }
 
         /* New styles for AI summary card */
-        .ai-summary-card {
+        .ai-summary-section {
           background: var(--panel);
           border: 1px solid var(--border);
           border-radius: var(--radius-1);
@@ -538,7 +552,7 @@ export default function NotesPage(){
           transition: all 0.2s ease;
         }
 
-        .ai-summary-card:hover {
+        .ai-summary-section:hover {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           transform: translateY(-1px);
         }
@@ -584,32 +598,58 @@ export default function NotesPage(){
           gap: 12px;
         }
 
-        .ai-error, .ai-empty-state, .ai-prompt, .ai-loading {
+        .ai-error-card, .ai-empty-card, .ai-prompt-card, .ai-loading-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-1);
+          padding: 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .ai-error-card:hover, .ai-empty-card:hover, .ai-prompt-card:hover, .ai-loading-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
+        }
+
+        .ai-error-card .error-header, .ai-empty-card .empty-header, .ai-prompt-card .prompt-header, .ai-loading-card .loading-header {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 12px;
-          border-radius: var(--radius-1);
-          background: var(--panel-light);
-          border: 1px solid var(--border-light);
+          margin-bottom: 8px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border);
         }
 
-        .ai-error .error-icon, .ai-empty-state .empty-icon, .ai-prompt .prompt-icon, .ai-loading .loading-spinner {
+        .ai-error-card .error-icon, .ai-empty-card .empty-icon, .ai-prompt-card .prompt-icon, .ai-loading-card .loading-spinner {
           font-size: 1.2rem;
           color: var(--accent);
         }
 
-        .ai-error .error-text, .ai-empty-state .empty-text, .ai-prompt .prompt-text, .ai-loading .loading-text {
+        .ai-error-card .error-title, .ai-empty-card .empty-title, .ai-prompt-card .prompt-title, .ai-loading-card .loading-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: var(--text);
+        }
+
+        .ai-error-card .error-content, .ai-empty-card .empty-content, .ai-prompt-card .prompt-content, .ai-loading-card .loading-content {
           font-size: 0.9rem;
           color: var(--muted);
           line-height: 1.4;
         }
 
-        .ai-summary-list {
-          background: var(--panel-light);
-          border: 1px solid var(--border-light);
+        .ai-summary-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
           border-radius: var(--radius-1);
-          padding: 12px;
+          padding: 16px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .ai-summary-card:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
         }
 
         .summary-header {
@@ -632,7 +672,7 @@ export default function NotesPage(){
           color: var(--text);
         }
 
-        .summary-bullets {
+        .summary-content {
           list-style: none;
           padding: 0;
           margin: 0;
@@ -656,7 +696,7 @@ export default function NotesPage(){
           line-height: 1.4;
         }
 
-        .ai-loading .loading-spinner {
+        .ai-loading-card .loading-spinner {
           border: 4px solid var(--border);
           border-top: 4px solid var(--accent);
           border-radius: 50%;
@@ -929,7 +969,7 @@ export default function NotesPage(){
         }
 
         .date-input {
-          width: 120px;
+          width: 140px;
           padding: 8px 12px;
           border: 1px solid var(--border);
           border-radius: var(--radius-1);

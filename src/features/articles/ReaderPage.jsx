@@ -88,43 +88,89 @@ export default function ReaderPage() {
         </header>
 
         {/* AI Summary (rainbow glow card) */}
-        <section className="ai-card" style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-            <span className="ai-chip">✨ AI Summary</span>
-            <div className="ui-mono" style={{ fontSize: 12, color: "var(--muted)" }}>
-              Mode: {aiState.mode.toUpperCase()}
+        <section className="ai-summary-section">
+          <div className="ai-summary-header">
+            <div className="ai-summary-title">
+              <span className="ai-chip">✨ AI Summary</span>
+              <div className="ai-mode-indicator">
+                Mode: {aiState.mode.toUpperCase()}
+              </div>
             </div>
-            <div style={{ flex: 1 }} />
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button className="btn" onClick={() => runAISummary("tldr")} disabled={aiState.loading}>
-                TL;DR
-              </button>
-              <button className="btn" onClick={() => runAISummary("detailed")} disabled={aiState.loading}>
-                Detailed
-              </button>
-              <button className="btn" onClick={() => runAISummary("outline")} disabled={aiState.loading}>
-                Outline
-              </button>
+            <div className="ai-summary-controls">
+              <div className="mode-buttons">
+                <button className="btn" onClick={() => runAISummary("tldr")} disabled={aiState.loading}>
+                  TL;DR
+                </button>
+                <button className="btn" onClick={() => runAISummary("detailed")} disabled={aiState.loading}>
+                  Detailed
+                </button>
+                <button className="btn" onClick={() => runAISummary("outline")} disabled={aiState.loading}>
+                  Outline
+                </button>
+              </div>
             </div>
           </div>
 
-          {aiState.err && <p className="prose" style={{ color: "crimson" }}>{aiState.err}</p>}
+          <div className="ai-summary-content">
+            {aiState.err && (
+              <div className="ai-error-card">
+                <div className="error-header">
+                  <span className="error-icon">⚠️</span>
+                  <span className="error-title">Error</span>
+                </div>
+                <div className="error-content">{aiState.err}</div>
+              </div>
+            )}
 
-          {aiState.summary ? (
-            aiState.mode === "outline" ? (
-              <ul className="prose" style={{ margin: 0, paddingLeft: "1.2em" }}>
-                {aiState.summary.split("\n").map((line, i) => (
-                  <li key={i}>{line.replace(/^[-•\s]+/, "")}</li>
-                ))}
-              </ul>
+            {!aiState.err && aiState.summary ? (
+              aiState.mode === "outline" ? (
+                <div className="ai-summary-card">
+                  <div className="summary-header">
+                    <span className="summary-icon">📋</span>
+                    <span className="summary-title">AI Generated Outline</span>
+                  </div>
+                  <div className="summary-content">
+                    <ul className="summary-bullets">
+                      {aiState.summary.split("\n").map((line, i) => (
+                        <li key={i} className="summary-bullet">
+                          <span className="bullet-marker">•</span>
+                          <span className="bullet-text">{line.replace(/^[-•\s]+/, "")}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="ai-summary-card">
+                  <div className="summary-header">
+                    <span className="summary-icon">📝</span>
+                    <span className="summary-title">AI Generated Summary</span>
+                  </div>
+                  <div className="summary-content">
+                    <div className="summary-text">{aiState.summary}</div>
+                  </div>
+                </div>
+              )
             ) : (
-              <p className="prose" style={{ margin: 0 }}>{aiState.summary}</p>
-            )
-          ) : (
-            <p className="prose" style={{ margin: 0, color: "var(--muted)" }}>
-              Choose a mode to generate a summary.
-            </p>
-          )}
+              <div className="ai-prompt-card">
+                <div className="prompt-header">
+                  <span className="prompt-icon">💡</span>
+                  <span className="prompt-title">Ready to Summarize</span>
+                </div>
+                <div className="prompt-content">Choose a mode above to generate an AI-powered summary of this article.</div>
+              </div>
+            )}
+
+            {aiState.loading && (
+              <div className="ai-loading-card">
+                <div className="loading-header">
+                  <div className="loading-spinner"></div>
+                  <span className="loading-title">Generating Summary</span>
+                </div>
+                <div className="loading-content">Analyzing article content and generating insights...</div>
+              </div>
+            )}
+          </div>
         </section>
 
         <div
@@ -136,3 +182,217 @@ export default function ReaderPage() {
     </div>
   );
 }
+
+<style jsx>{`
+  .ai-summary-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-1);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .ai-summary-section:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .ai-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .ai-summary-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ai-summary-title .ai-chip {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .ai-mode-indicator {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 2px 6px;
+    background: var(--panel-light);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+  }
+
+  .ai-summary-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mode-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .ai-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ai-error-card, .ai-prompt-card, .ai-loading-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-1);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .ai-error-card:hover, .ai-prompt-card:hover, .ai-loading-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .ai-error-card .error-header, .ai-prompt-card .prompt-header, .ai-loading-card .loading-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ai-error-card .error-icon, .ai-prompt-card .prompt-icon, .ai-loading-card .loading-spinner {
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .ai-error-card .error-title, .ai-prompt-card .prompt-title, .ai-loading-card .loading-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .ai-error-card .error-content, .ai-prompt-card .prompt-content, .ai-loading-card .loading-content {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .ai-summary-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-1);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .ai-summary-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-header .summary-icon {
+    font-size: 1rem;
+    color: var(--accent);
+  }
+
+  .summary-header .summary-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary-text {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .summary-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .summary-bullet {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .summary-bullet .bullet-marker {
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .summary-bullet .bullet-text {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .ai-loading-card .loading-spinner {
+    border: 4px solid var(--border);
+    border-top: 4px solid var(--accent);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .ai-summary-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .ai-summary-controls {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .mode-buttons {
+      gap: 4px;
+    }
+  }
+`}</style>
