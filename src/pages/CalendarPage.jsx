@@ -2,25 +2,28 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../features/calendar/calendar.api";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { ymd, firstOfMonthDate, addDays } from "../lib/date";
 import "../styles/calendar.css";
 
-function ymd(d){ return new Date(d).toISOString().slice(0,10); }
-function firstOfMonth(d){ const x = new Date(d); x.setDate(1); x.setHours(0,0,0,0); return x; }
-function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
 function startOfGrid(monthDate){
-  const first = firstOfMonth(monthDate);
+  const first = firstOfMonthDate(monthDate);
   const dow = first.getDay(); // 0=Sun
-  return addDays(first, -dow); // Sunday grid start
+  // Use our date utility to avoid timezone issues
+  const startDate = new Date(first);
+  startDate.setDate(startDate.getDate() - dow);
+  return startDate;
 }
 function endOfGrid(monthDate){
   const start = startOfGrid(monthDate);
-  return addDays(start, 6*7 - 1); // 6 weeks grid
+  const endDate = new Date(start);
+  endDate.setDate(endDate.getDate() + 6*7 - 1); // 6 weeks grid
+  return endDate;
 }
 function sameDay(a,b){ return ymd(a) === ymd(b); }
 
 export default function CalendarPage(){
   const { token } = useAuth();
-  const [monthDate, setMonthDate] = useState(firstOfMonth(new Date()));
+  const [monthDate, setMonthDate] = useState(firstOfMonthDate(new Date()));
   const [selected, setSelected] = useState(ymd(new Date()));
   const [viewMode, setViewMode] = useState("month"); // "month", "week", or "list"
   const [isMobile, setIsMobile] = useState(false);
@@ -32,6 +35,19 @@ export default function CalendarPage(){
 
   // AI plan
   const [plan, setPlan] = useState({ loading: true, item: null, nothingToDo: false, err: "" });
+
+  // Debug: Log the selected date to see what's happening
+  useEffect(() => {
+    console.log('Calendar Debug:', {
+      selected,
+      selectedDate: new Date(selected),
+      selectedDateString: new Date(selected).toISOString(),
+      selectedDateLocal: new Date(selected).toLocaleDateString(),
+      today: ymd(new Date()),
+      todayDate: new Date(),
+      todayISO: new Date().toISOString()
+    });
+  }, [selected]);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -46,6 +62,19 @@ export default function CalendarPage(){
 
   const gridStart = useMemo(()=> startOfGrid(monthDate), [monthDate]);
   const gridEnd   = useMemo(()=> endOfGrid(monthDate),   [monthDate]);
+
+  // Debug: Log grid calculation
+  useEffect(() => {
+    console.log('Grid Debug:', {
+      monthDate,
+      gridStart,
+      gridEnd,
+      gridStartYmd: ymd(gridStart),
+      gridEndYmd: ymd(gridEnd),
+      selected,
+      monthDateString: monthDate.toISOString()
+    });
+  }, [monthDate, gridStart, gridEnd, selected]);
 
   const days = useMemo(()=>{
     const arr = [];
@@ -133,9 +162,9 @@ export default function CalendarPage(){
   // modal state
   const [modal, setModal] = useState({ open:false, data:null });
 
-  function prevMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()-1); setMonthDate(firstOfMonth(d)); }
-  function nextMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()+1); setMonthDate(firstOfMonth(d)); }
-  function today(){ const t = firstOfMonth(new Date()); setMonthDate(t); setSelected(ymd(new Date())); }
+  function prevMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()-1); setMonthDate(firstOfMonthDate(d)); }
+  function nextMonth(){ const d = new Date(monthDate); d.setMonth(d.getMonth()+1); setMonthDate(firstOfMonthDate(d)); }
+  function today(){ const t = firstOfMonthDate(new Date()); setMonthDate(t); setSelected(ymd(new Date())); }
 
   function prevWeek(){ 
     const d = new Date(selected); 

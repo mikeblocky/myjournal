@@ -68,6 +68,18 @@ export function firstOfMonth(d = new Date()) {
 }
 
 /**
+ * Get first day of month as Date object (for internal calculations)
+ * @param {Date|string} d - Date in the month
+ * @returns {Date} First day of month as Date object
+ */
+export function firstOfMonthDate(d = new Date()) {
+  const date = new Date(d);
+  date.setDate(1);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+/**
  * Get last day of month
  * @param {Date|string} d - Date in the month
  * @returns {string} Last day of month in YYYY-MM-DD format
