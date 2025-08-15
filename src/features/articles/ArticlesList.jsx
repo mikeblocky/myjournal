@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import * as api from "./articles.api";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import "../../styles/journal.css"; // reuse tokens + cards
 import "./articles.css";          // styles below
 
@@ -98,7 +99,7 @@ export default function ArticlesList(){
       )}
 
       {err && <p className="prose" style={{ color:"crimson" }}>{err}</p>}
-      {loading ? <p className="prose">Loading…</p> : (
+      {loading ? <LoadingSpinner text="Loading articles..." variant="compact" /> : (
         filtered.length === 0 ? <p className="prose">No articles found.</p> : (
           <section className="a-grid">
             {/* Hero card (first item) */}

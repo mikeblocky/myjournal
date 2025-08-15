@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../features/notes/notes.api";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function todayUTC(){ return new Date().toISOString().slice(0,10); }
 
@@ -131,7 +132,7 @@ export default function NotesPage(){
       {/* List notes */}
       <section className="card" style={{ padding:16 }}>
         {err && <p className="prose" style={{ color:"crimson" }}>{err}</p>}
-        {loading ? <p className="prose">Loading…</p> : (
+        {loading ? <LoadingSpinner text="Loading notes..." variant="compact" /> : (
           list.length === 0 ? <p className="prose" style={{ margin:0 }}>No notes for {date}.</p> : (
             <ul style={{ listStyle:"none", padding:0, margin:0, display:"grid", gap:10 }}>
               {list.map(n=>(

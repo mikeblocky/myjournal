@@ -10,6 +10,14 @@
   /* motion */
   --dur-fast: 120ms; --dur-med: 220ms; --dur-slow: 360ms;
   --ease-out: cubic-bezier(.2,.8,.2,1);
+  
+  /* rainbow colors for AI effects */
+  --rainbow-red: #ff6b6b;
+  --rainbow-orange: #ffd93d;
+  --rainbow-green: #6bff95;
+  --rainbow-blue: #63c5ff;
+  --rainbow-purple: #c77dff;
+  --rainbow-pink: #ff6b9d;
 }
 
 /* prefers reduced motion */

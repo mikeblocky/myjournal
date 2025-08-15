@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import * as api from "../features/journal/journal.api";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/journal.css";
 
 function snippet(t="", n=180){ const s=(t||"").replace(/\s+/g," ").trim(); return s.length>n? s.slice(0,n-1)+"…" : s; }
@@ -33,7 +34,7 @@ export default function PressFeed(){
       </div>
 
       {state.err && <p className="prose" style={{color:"crimson"}}>{state.err}</p>}
-      {state.loading ? <p className="prose">Loading…</p> : (
+      {state.loading ? <LoadingSpinner text="Loading press feed..." variant="compact" /> : (
         state.items.length === 0 ? <p className="prose">No published journals yet.</p> : (
           <section className="j-more">
             {state.items.map(j=>(

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../features/calendar/calendar.api";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/calendar.css";
 
 function ymd(d){ return new Date(d).toISOString().slice(0,10); }
@@ -272,7 +273,7 @@ export default function CalendarPage(){
       {/* Calendar Views */}
       <div className="card" style={{ padding:12 }}>
         {err && <p className="prose" style={{ color:"crimson" }}>{err}</p>}
-        {loading ? <p className="prose">Loading…</p> : (
+        {loading ? <LoadingSpinner text="Loading calendar..." variant="compact" /> : (
           <>
             {/* Month/Week Grid View */}
             {(viewMode === "month" || viewMode === "week") && (

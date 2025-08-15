@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import * as api from "./articles.api";
 import * as ai from "../ai/ai.api";
 import { sanitizeArticle } from "../../lib/sanitize";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import "../../styles/reader.css";
 
 function hostFromUrl(u) {
@@ -66,7 +67,7 @@ export default function ReaderPage() {
   }
 
   if (!token) return <p className="prose">Please log in to view this article.</p>;
-  if (state.loading) return <p className="prose">Loading…</p>;
+  if (state.loading) return <LoadingSpinner text="Loading article..." variant="compact" />;
   if (state.err) return <p className="prose" style={{ color: "crimson" }}>{state.err}</p>;
 
   const a = state.article;

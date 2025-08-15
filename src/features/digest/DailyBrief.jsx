@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import * as api from "./digest.api";
 import * as articlesApi from "../articles/articles.api";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 function todayUTC() { return new Date().toISOString().slice(0, 10); }
 function hostFromUrl(u) { try { return new URL(u).host.replace(/^www\./, ""); } catch { return ""; } }
@@ -48,7 +49,7 @@ export default function DailyBrief() {
     }
 
     if (!token) return <p className="prose">Please <Link to="/login">log in</Link> to see your daily brief.</p>;
-    if (state.loading) return <p className="prose">Loading…</p>;
+    if (state.loading) return <LoadingSpinner text="Loading daily brief..." variant="compact" />;
 
     const d = state.digest;
 

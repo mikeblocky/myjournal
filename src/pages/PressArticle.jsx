@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import * as api from "../features/journal/journal.api";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/reader.css";
 
 export default function PressArticle(){
@@ -19,7 +20,7 @@ export default function PressArticle(){
     return ()=>{ on=false; };
   },[slug]);
 
-  if (state.loading) return <p className="prose">Loading…</p>;
+  if (state.loading) return <LoadingSpinner text="Loading article..." variant="compact" />;
   if (state.err) return <p className="prose" style={{color:"crimson"}}>{state.err}</p>;
   if (!state.item) return <p className="prose">Not found.</p>;
 

@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../features/journal/journal.api";
 import { timeAgo } from "../lib/date";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/reader.css";
 
 function isOutlineContent(text) {
@@ -79,7 +80,7 @@ export default function JournalView(){
   },[token, id]);
 
   if(!token) return <p className="prose">Please <Link to="/login">log in</Link>.</p>;
-  if(state.loading) return <p className="prose">Loading…</p>;
+  if(state.loading) return <LoadingSpinner text="Loading journal..." variant="compact" />;
   if(state.err) return <p className="prose" style={{color:"crimson"}}>{state.err}</p>;
 
   const j = state.item;

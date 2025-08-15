@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import * as api from "../features/journal/journal.api";
 import { Link, useNavigate } from "react-router-dom";
 import { timeAgo } from "../lib/date";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/journal.css";
 
 function snippet(t="", n=140){ const s=(t||"").replace(/\s+/g," ").trim(); return s.length>n? s.slice(0,n-1)+"…" : s; }
@@ -89,7 +90,7 @@ export default function JournalHome(){
 
       {err && <p className="prose" style={{color:"crimson"}}>{err}</p>}
 
-      {loading ? <p className="prose">Loading…</p> : (
+      {loading ? <LoadingSpinner text="Loading journals..." variant="compact" /> : (
         items.length === 0 ? (
           <div className="card" style={{padding:16}}>
             <p className="prose" style={{margin:"0 0 10px 0"}}>No journals yet.</p>

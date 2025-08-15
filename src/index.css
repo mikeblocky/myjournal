@@ -60,44 +60,330 @@ blockquote{
 }
 
 
-/* AI glow styles — static (no spin) */
+/* AI glow styles — rainbow flowing effects */
 .ai-chip{
-  display:inline-flex; align-items:center; gap:6px;
-  font-family: var(--font-ui); font-size: 11px; letter-spacing:.04em;
-  text-transform: uppercase; color: var(--text);
-  padding: 6px 10px; border-radius: 999px; position: relative;
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  font-family: var(--font-ui); 
+  font-size: 11px; 
+  letter-spacing: .04em;
+  text-transform: uppercase; 
+  color: var(--text);
+  padding: 8px 16px; 
+  border-radius: 36px; 
+  position: relative;
   background: var(--panel);
   border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  /* Responsive behavior */
+  min-width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments for AI chip */
+@media (max-width: 768px) {
+  .ai-chip {
+    padding: 6px 12px;
+    border-radius: 22px;
+    font-size: 10px;
+  }
+  
+  /* Improve layout on medium screens */
+  .ai-card .ai-chip {
+    margin-right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-chip {
+    padding: 5px 10px;
+    border-radius: 18px;
+    font-size: 9px;
+  }
+  
+  /* Stack elements vertically on very small screens */
+  .ai-card > div:first-child {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .ai-card .ai-chip {
+    align-self: flex-start;
+  }
+}
+
+.ai-chip:hover {
+  background: linear-gradient(
+    45deg,
+    var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
+    var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow-text 3s ease-in-out infinite;
+  text-shadow: none;
+}
+
+/* Special effect for AI chip inside AI card */
+.ai-card .ai-chip:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--rainbow-purple);
+}
+
+/* Rainbow text effect for AI chip in AI card */
+.ai-card .ai-chip {
+  background: linear-gradient(
+    45deg,
+    var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
+    var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow-text-slow 4s ease-in-out infinite;
+}
+
+/* Rainbow effect for outline bullets */
+.ai-card ul li {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.ai-card ul li:hover {
+  color: var(--rainbow-blue);
+  transform: translateX(5px);
+}
+
+.ai-card ul li::before {
+  content: "•";
+  position: absolute;
+  left: -1.2em;
+  color: var(--rainbow-purple);
+  animation: rainbow-bullet 2s ease-in-out infinite;
+}
+
+/* Responsive bullet positioning */
+@media (max-width: 768px) {
+  .ai-card ul li::before {
+    left: -1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-card ul li::before {
+    left: -0.8em;
+  }
+}
+
+/* Rainbow border animation for AI card with content */
+.ai-card:has(p:not(:empty)), .ai-card:has(ul:not(:empty)) {
+  border-image: linear-gradient(
+    45deg,
+    var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
+    var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)
+  ) 1;
+  border-image-slice: 1;
+  animation: rainbow-border 4s linear infinite;
 }
 
 .ai-card{
-  position:relative; padding:16px; border-radius: var(--radius-2);
+  position:relative; 
+  padding: 20px; 
+  border-radius: 32px;
   background: var(--panel);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255,255,255,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: ai-card-enter 0.6s ease-out;
+  /* Responsive behavior */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* static rainbow halo that sticks to the element */
+/* Responsive padding adjustments */
+@media (max-width: 768px) {
+  .ai-card {
+    padding: 16px;
+    border-radius: 24px;
+  }
+  
+  /* Adjust content spacing on smaller screens */
+  .ai-card > *:first-child {
+    margin-top: 0;
+  }
+  
+  .ai-card > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+  
+  /* Compact spacing for very small screens */
+  .ai-card .ai-chip {
+    margin-bottom: 8px;
+  }
+  
+  .ai-card ul {
+    padding-left: 1em;
+  }
+}
+
+/* Subtle rainbow background pattern */
+.ai-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, var(--rainbow-pink) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, var(--rainbow-blue) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, var(--rainbow-green) 0%, transparent 50%);
+  opacity: 0.03;
+  z-index: -4;
+  animation: rainbow-bg-float 8s ease-in-out infinite;
+}
+
+.ai-card:hover {
+  border-color: var(--rainbow-blue);
+  box-shadow: 
+    0 6px 16px rgba(0,0,0,.08), 
+    0 2px 6px rgba(0,0,0,.06),
+    0 0 20px rgba(99, 197, 255, 0.3);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--panel) 95%, var(--rainbow-blue) 5%),
+    color-mix(in oklab, var(--panel) 95%, var(--rainbow-purple) 5%),
+    color-mix(in oklab, var(--panel) 95%, var(--rainbow-pink) 5%)
+  );
+}
+
+/* Rainbow flowing halo with multiple layers */
 .ai-chip::before,
 .ai-card::before{
   content:"";
-  position:absolute; inset:-2px; border-radius:inherit;
-  /* keep the same rainbow, but no animation */
+  position:absolute; inset:-3px; border-radius:inherit;
   background: conic-gradient(
     from 0deg,
-    #ff6b6b, #ffd93d, #6bff95, #63c5ff, #c77dff, #ff6b6b
+    var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
+    var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red)
   );
   z-index:-1;
-  filter: blur(10px); opacity:.6;
+  filter: blur(12px); opacity:.7;
+  animation: rainbow-flow 8s linear infinite;
 
   /* punch out the middle so it reads like an outline */
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  padding: 2px;
+  padding: 3px;
   -webkit-mask-composite: xor; mask-composite: exclude;
+}
 
-  /* important: no animation so it doesn't rotate */
-  animation: none !important;
+/* Responsive rainbow effects */
+@media (max-width: 768px) {
+  .ai-chip::before,
+  .ai-card::before {
+    inset: -2px;
+    padding: 2px;
+    filter: blur(8px);
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-chip::before,
+  .ai-card::before {
+    inset: -1px;
+    padding: 1px;
+    filter: blur(6px);
+  }
+}
+
+/* Additional flowing rainbow layer */
+.ai-chip::after,
+.ai-card::after{
+  content:"";
+  position:absolute; inset:-1px; border-radius:inherit;
+  background: linear-gradient(
+    45deg,
+    var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), 
+    var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red)
+  );
+  background-size: 400% 400%;
+  z-index:-2;
+  filter: blur(8px); opacity:.4;
+  animation: rainbow-wave 6s ease-in-out infinite, rainbow-pulse 4s ease-in-out infinite;
+  
+  /* punch out the middle */
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  padding: 1px;
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+
+/* Responsive secondary rainbow effects */
+@media (max-width: 768px) {
+  .ai-chip::after,
+  .ai-card::after {
+    inset: -1px;
+    padding: 1px;
+    filter: blur(6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-chip::after,
+  .ai-card::after {
+    inset: 0px;
+    padding: 0px;
+    filter: blur(4px);
+  }
+}
+
+/* Third rainbow layer for extra magic */
+.ai-card {
+  position: relative;
+}
+
+.ai-card::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 30% 20%,
+    var(--rainbow-pink) 0%,
+    var(--rainbow-purple) 25%,
+    var(--rainbow-blue) 50%,
+    var(--rainbow-green) 75%,
+    var(--rainbow-orange) 100%
+  );
+  z-index: -3;
+  filter: blur(20px);
+  opacity: 0.3;
+  animation: rainbow-float 10s ease-in-out infinite;
+  
+  /* punch out the middle */
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  padding: 5px;
+  -webkit-mask-composite: xor; mask-composite: exclude;
 }
 
 /* optional: subtle “wake up” on hover/focus without spinning */
@@ -105,9 +391,337 @@ blockquote{
 .ai-chip:focus-visible::before,
 .ai-card:hover::before,
 .ai-card:focus-within::before{
-  opacity:.75;
-  filter: blur(10px) brightness(1.05);
+  opacity:.9;
+  filter: blur(15px) brightness(1.2);
+  animation: rainbow-flow 4s linear infinite;
 }
 
-/* you can remove the keyframes entirely; keeping here does nothing */
-@keyframes ai-spin { to { transform: rotate(360deg); } }
+/* Focus rainbow effects */
+.ai-card:focus-within {
+  outline: 2px solid var(--rainbow-blue);
+  outline-offset: 2px;
+  box-shadow: 
+    0 6px 16px rgba(0,0,0,.08), 
+    0 2px 6px rgba(0,0,0,.06),
+    0 0 20px rgba(99, 197, 255, 0.4),
+    0 0 40px rgba(99, 197, 255, 0.2);
+}
+
+.ai-chip:hover::after,
+.ai-chip:focus-visible::after,
+.ai-card:hover::after,
+.ai-card:focus-within::after{
+  opacity:.6;
+  filter: blur(10px) brightness(1.1);
+  animation: rainbow-wave 3s ease-in-out infinite;
+}
+
+/* Focus rainbow effects for AI chip */
+.ai-chip:focus-visible {
+  outline: 2px solid var(--rainbow-purple);
+  outline-offset: 2px;
+  box-shadow: 0 0 15px var(--rainbow-purple);
+}
+
+/* Loading Spinner Component */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.loading-spinner .spinner {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner .spinner::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 3px solid transparent;
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite reverse;
+  opacity: 0.6;
+}
+
+.loading-spinner .text {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.loading-spinner .dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.loading-spinner .dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: dots-bounce 1.4s ease-in-out infinite both;
+}
+
+.loading-spinner .dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-spinner .dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-spinner .dots span:nth-child(3) { animation-delay: 0s; }
+
+/* Compact loading spinner for smaller spaces */
+.loading-spinner.compact {
+  padding: 20px;
+  gap: 12px;
+}
+
+.loading-spinner.compact .spinner {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}
+
+.loading-spinner.compact .spinner::after {
+  border-width: 2px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+}
+
+.loading-spinner.compact .text {
+  font-size: 12px;
+}
+
+.loading-spinner.compact .dots span {
+  width: 4px;
+  height: 4px;
+}
+
+/* Inline loading spinner for buttons and small elements */
+.loading-spinner.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.loading-spinner.inline .spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.loading-spinner.inline .spinner::after {
+  border-width: 2px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+}
+
+.loading-spinner.inline .text {
+  font-size: 12px;
+}
+
+/* Loading animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Button loading state */
+.btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* AI Summary loading state */
+.ai-card.loading-summary {
+  position: relative;
+}
+
+.ai-card.loading-summary::before {
+  animation: rainbow-flow 4s linear infinite, ai-loading-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ai-loading-pulse {
+  0%, 100% { 
+    opacity: 0.7;
+    filter: blur(12px) brightness(1);
+  }
+  50% { 
+    opacity: 1;
+    filter: blur(15px) brightness(1.3);
+  }
+}
+
+@keyframes dots-bounce {
+  0%, 80%, 100% { 
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Rainbow flowing animation */
+@keyframes rainbow-flow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Rainbow wave animation */
+@keyframes rainbow-wave {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Additional pulsing glow effect */
+@keyframes rainbow-pulse {
+  0%, 100% { 
+    opacity: 0.4;
+    filter: blur(8px) brightness(1);
+  }
+  50% { 
+    opacity: 0.7;
+    filter: blur(12px) brightness(1.3);
+  }
+}
+
+/* Floating rainbow effect */
+@keyframes rainbow-float {
+  0%, 100% { 
+    transform: translateY(0px) scale(1);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+/* Rainbow text animation */
+@keyframes rainbow-text {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Rainbow bullet animation */
+@keyframes rainbow-bullet {
+  0%, 100% { 
+    color: var(--rainbow-purple);
+    transform: scale(1);
+  }
+  50% { 
+    color: var(--rainbow-pink);
+    transform: scale(1.2);
+  }
+}
+
+/* AI card entrance animation */
+@keyframes ai-card-enter {
+  0% { 
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    filter: blur(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Rainbow border animation */
+@keyframes rainbow-border {
+  0% { border-image-source: linear-gradient(0deg, var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)); }
+  16.67% { border-image-source: linear-gradient(60deg, var(--rainbow-orange), var(--rainbow-green), var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red)); }
+  33.33% { border-image-source: linear-gradient(120deg, var(--rainbow-green), var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red), var(--rainbow-orange)); }
+  50% { border-image-source: linear-gradient(180deg, var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green)); }
+  66.67% { border-image-source: linear-gradient(240deg, var(--rainbow-purple), var(--rainbow-pink), var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), var(--rainbow-blue)); }
+  83.33% { border-image-source: linear-gradient(300deg, var(--rainbow-pink), var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), var(--rainbow-blue), var(--rainbow-purple)); }
+  100% { border-image-source: linear-gradient(360deg, var(--rainbow-red), var(--rainbow-orange), var(--rainbow-green), var(--rainbow-blue), var(--rainbow-purple), var(--rainbow-pink)); }
+}
+
+/* Slow rainbow text animation */
+@keyframes rainbow-text-slow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Rainbow background float animation */
+@keyframes rainbow-bg-float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 0.03;
+  }
+  33% { 
+    transform: translate(10px, -10px) scale(1.1);
+    opacity: 0.05;
+  }
+  66% { 
+    transform: translate(-10px, 10px) scale(0.9);
+    opacity: 0.04;
+  }
+}
+
+/* Loading state rainbow effects */
+.ai-card.loading {
+  animation: ai-card-enter 0.6s ease-out, rainbow-loading 2s ease-in-out infinite;
+}
+
+.ai-card.loading::before {
+  animation: rainbow-flow 4s linear infinite, rainbow-loading-pulse 2s ease-in-out infinite;
+}
+
+/* Loading rainbow animations */
+@keyframes rainbow-loading {
+  0%, 100% { 
+    transform: scale(1);
+    filter: blur(12px) brightness(1);
+  }
+  50% { 
+    transform: scale(1.02);
+    filter: blur(15px) brightness(1.3);
+  }
+}
+
+@keyframes rainbow-loading-pulse {
+  0%, 100% { 
+    opacity: 0.7;
+  }
+  50% { 
+    opacity: 1;
+  }
+}
