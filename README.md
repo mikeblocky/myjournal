@@ -1,3 +1,6 @@
+# This project is a successor of two first projects we made (you can find my repositories)
+myknowledge, artshare
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
